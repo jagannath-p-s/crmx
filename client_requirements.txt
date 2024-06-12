@@ -1,6 +1,8 @@
+Main features requested by the admin 
+
 first in first out - sale , low waiting number first , 
 
-descrition , feed back , saakshi patram , 
+description , feed back , saakshi patram , 
 
 when pipeline change stages also change , but field all same , stages only we can change , we should also be able to change stages
 
