@@ -6,6 +6,7 @@ import ManagerPage from './pages/ManagerPage';
 import SalesmanPage from './pages/SalesmanPage';
 import AgentPage from './pages/AgentPage';
 import CloserPage from './pages/CloserPage';
+import ContactsPage from './pages/ContactsPage'; // Import ContactsPage
 
 const App = () => {
   return (
@@ -18,7 +19,7 @@ const App = () => {
         <Route path="/salesman" element={<SalesmanPage />} />
         <Route path="/agent" element={<AgentPage />} />
         <Route path="/closer" element={<CloserPage />} />
-        {/* Add other routes here */}
+        <Route path="/contacts" element={<ContactsPage />} /> {/* Add the route for ContactsPage */}
       </Routes>
     </Router>
   );
