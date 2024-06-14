@@ -5,13 +5,27 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 const Contacts = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [expanded, setExpanded] = useState('Lead');
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
+
+  const toggleExpand = (column) => {
+    setExpanded(expanded === column ? '' : column);
+  };
+
+  const columns = [
+    { name: 'Lead', color: 'purple' },
+    { name: 'Prospect', color: 'blue' },
+    { name: 'Opportunity', color: 'indigo' },
+    { name: 'Customer-Won', color: 'green' },
+    { name: 'Lost/Rejected', color: 'red' }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -68,6 +82,46 @@ const Contacts = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Lead Stages */}
+      <div className="flex flex-grow p-4 space-x-4">
+        {columns.map((column) => (
+          <div
+            key={column.name}
+            className={`flex flex-col ${expanded === column.name ? 'w-64' : 'w-16'} ${expanded === column.name ? `bg-${column.color}-100` : 'bg-gray-100'} border ${expanded === column.name ? `border-${column.color}-300` : 'border-gray-300'} p-4 rounded-lg shadow-md`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className={`text-lg font-semibold ${expanded === column.name ? 'block' : 'hidden'}`}>
+                {column.name}
+              </h2>
+              <button className="text-gray-500" onClick={() => toggleExpand(column.name)}>
+                {expanded === column.name ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+              </button>
+            </div>
+            {expanded !== column.name && (
+              <div className="flex items-center justify-center">
+                <p className="transform rotate-90 text-lg font-semibold text-gray-600">{column.name}</p>
+              </div>
+            )}
+            {expanded === column.name && (
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                {column.name === 'Lead' && (
+                  <>
+                    <p className="font-bold text-blue-600">John Doe</p>
+                    <p>Contact No: 9999999999</p>
+                    <p>Email: johndoe@gmail.com</p>
+                    <p>Date created: 14-05-2024</p>
+                  </>
+                )}
+                {column.name === 'Prospect' && <p>Prospect content here</p>}
+                {column.name === 'Opportunity' && <p>Opportunity content here</p>}
+                {column.name === 'Customer-Won' && <p>Customer-Won content here</p>}
+                {column.name === 'Lost/Rejected' && <p>Lost/Rejected content here</p>}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
