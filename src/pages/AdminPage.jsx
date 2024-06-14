@@ -1,35 +1,41 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import React, { useState, useEffect, useRef } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import HelpCenterIcon from '@mui/icons-material/HelpCenter';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ContactsIcon from '@mui/icons-material/Contacts';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import EventIcon from '@mui/icons-material/Event';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import Inventory2Icon from '@mui/icons-material/Inventory2';
-import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import BusinessIcon from '@mui/icons-material/Business';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import ArticleIcon from '@mui/icons-material/Article';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import AddIcon from '@mui/icons-material/Add';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
 import Tooltip from '@mui/material/Tooltip';
-import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import logo from '../pages/logo.png';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline'; // Handbag icon
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
+import BuildIcon from '@mui/icons-material/Build';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import StorageIcon from '@mui/icons-material/Storage';
+
+import Contacts from './admincomponents/Contacts';
+import Sales from './admincomponents/Sales';
+import Activities from './admincomponents/Activities';
+import Dashboard from './admincomponents/Dashboard';
+import Products from './admincomponents/Products';
+import Services from './admincomponents/Services';
+import Stock from './admincomponents/Stock';
+import UploadFiles from './admincomponents/UploadFiles';
+import Documents from './admincomponents/Documents';
 
 const AdminPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [activeComponent, setActiveComponent] = useState('Dashboard');
+  const sidebarRef = useRef(null);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -39,33 +45,84 @@ const AdminPage = () => {
     setAnchorEl(null);
   };
 
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleClickOutside = (event) => {
+    if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+      setIsExpanded(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const navItems = [
-    { icon: <BusinessIcon />, tooltip: "Organizations", path: "#" },
-    { icon: <ContactsIcon />, tooltip: "Contacts", path: "/contacts" },
-    { icon: <WorkOutlineIcon />, tooltip: "Sales", path: "#" }, // Updated icon for Sales
-    { icon: <PendingActionsIcon />, tooltip: "Activities", path: "#" },
-    { icon: <BarChartIcon />, tooltip: "Dashboard", path: "#" },
-    { icon: <DescriptionIcon />, tooltip: "Documents", path: "#" },
-    { icon: <AccountBalanceWalletIcon />, tooltip: "Expenses", path: "#" },
-    { icon: <Inventory2Icon />, tooltip: "Products and Services", path: "#" },
-    { icon: <DriveFolderUploadIcon />, tooltip: "Upload Files", path: "#" },
+    { icon: <PeopleOutlineIcon />, tooltip: "Contacts", component: 'Contacts' },
+    { icon: <ShoppingBagOutlinedIcon />, tooltip: "Sales", component: 'Sales' },
+    { icon: <EventNoteIcon />, tooltip: "Activities", component: 'Activities' },
+    { icon: <EqualizerIcon />, tooltip: "Dashboard", component: 'Dashboard' },
+    { icon: <ShoppingBasketIcon />, tooltip: "Products", component: 'Products' },
+    { icon: <BuildIcon />, tooltip: "Services", component: 'Services' },
+    { icon: <StorageIcon />, tooltip: "Stock", component: 'Stock' },
+    { icon: <CloudUploadOutlinedIcon />, tooltip: "Upload Files", component: 'UploadFiles' },
+    { icon: <InsertDriveFileOutlinedIcon />, tooltip: "Documents", component: 'Documents' }
   ];
+
+  const renderComponent = () => {
+    switch(activeComponent) {
+      case 'Contacts':
+        return <Contacts />;
+      case 'Sales':
+        return <Sales />;
+      case 'Activities':
+        return <Activities />;
+      case 'Dashboard':
+        return <Dashboard />;
+      case 'Products':
+        return <Products />;
+      case 'Services':
+        return <Services />;
+      case 'Stock':
+        return <Stock />;
+      case 'UploadFiles':
+        return <UploadFiles />;
+      case 'Documents':
+        return <Documents />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-16 bg-white shadow-md flex flex-col items-center px-2 py-4">
-        <div className="mb-4">
-          <img src="https://app.zenys.org/assets/icons/icon-72x72.png" alt="Logo" className="w-11 mx-auto" />
+      <div
+        ref={sidebarRef}
+        className={`bg-white shadow-lg flex flex-col items-start py-4 px-3 border-r border-gray-200 transition-all duration-300 ${
+          isExpanded ? 'w-48' : 'w-20 items-center'
+        }`}
+      >
+        <div className="flex items-center justify-center mb-6 w-full">
+          <img src="https://app.zenys.org/assets/icons/icon-72x72.png" alt="Logo" className="w-10 h-10" />
         </div>
-        <nav className="flex flex-col items-center w-full">
+        <nav className={`flex flex-col w-full ${isExpanded ? 'space-y-1' : 'space-y-1 items-center'}`}>
           {navItems.map((item, index) => (
-            <Tooltip key={index} title={item.tooltip} placement="right">
-              <Link to={item.path} className="flex flex-col items-center pt-2 w-full text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition duration-200">
-                <div className="toolbar-icon mb-2" style={{ fontSize: '20px' }}>
-                  {item.icon}
-                </div>
-              </Link>
+            <Tooltip key={index} title={!isExpanded ? item.tooltip : ''} placement="right">
+              <button
+                onClick={() => setActiveComponent(item.component)}
+                className={`p-2 uppercase rounded-lg hover:bg-blue-100 transition duration-200 flex items-center ${
+                  isExpanded ? 'pl-2 pr-3' : 'justify-center'
+                } ${activeComponent === item.component ? 'bg-blue-100' : ''}`}
+              >
+                {React.cloneElement(item.icon, { className: "text-gray-600", style: { fontSize: '1.75rem' } })}
+                {isExpanded && <span className="ml-3 text-xs font-semibold text-gray-700">{item.tooltip}</span>}
+              </button>
             </Tooltip>
           ))}
         </nav>
@@ -73,134 +130,63 @@ const AdminPage = () => {
 
       {/* Main Content */}
       <div className="flex-1">
-        <div className="flex justify-between items-center px-4 py-2 bg-white shadow-md">
-          <div className="flex items-center space-x-2">
-            <Tooltip title="Toggle Sidenav">
-              <button className="p-2 rounded-full hover:bg-gray-200">
-                <MenuOpenIcon color="action" style={{ fontSize: '24px' }} />
-              </button>
-            </Tooltip>
-            <div className="border border-gray-300 rounded-2xl bg-white text-gray-600 flex items-center px-3 py-1">
-              <Tooltip title="Search">
-                <button className="p-1 rounded-full hover:bg-gray-200">
-                  <SearchIcon color="action" style={{ fontSize: '24px' }} />
+        <div className="bg-white shadow-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-3">
+              <div className="flex items-center space-x-4">
+                <Tooltip title="Toggle Sidenav">
+                  <button onClick={handleToggle} className="p-2 rounded-full text-gray-500 hover:bg-gray-100">
+                    <MenuIcon />
+                  </button>
+                </Tooltip>
+                <div className="relative">
+                  <input type="text" placeholder="Search" className="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <SearchIcon className="absolute left-3 top-2.5 text-gray-400" />
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Tooltip title="Chat">
+                  <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                    <ForumOutlinedIcon />
+                  </button>
+                </Tooltip>
+                <Tooltip title="Notifications">
+                  <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                    <NotificationsNoneIcon />
+                  </button>
+                </Tooltip>
+                <Tooltip title="Add new">
+                  <button className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600">
+                    <AddIcon />
+                  </button>
+                </Tooltip>
+                <button
+                  className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white"
+                  onClick={handleMenuOpen}
+                >
+                  J
                 </button>
-              </Tooltip>
-              <span className="ml-2">Search</span>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={handleMenuClose} className="flex items-center">
+                    <SettingsOutlinedIcon className="mr-2" style={{ fontSize: '20px' }} />
+                    <span className="text-sm">Settings</span>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose} className="flex items-center">
+                    <ExitToAppIcon className="mr-2" style={{ fontSize: '20px' }} />
+                    <span className="text-sm">Logout</span>
+                  </MenuItem>
+                </Menu>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Tooltip title="Inquiries">
-              <button className="p-1 rounded-full hover:bg-gray-100">
-                <RateReviewIcon style={{ fontSize: '22px', color: 'gray' }} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Chat">
-              <button className="p-1 rounded-full hover:bg-gray-100">
-                <QuestionAnswerIcon style={{ fontSize: '22px', color: 'gray' }} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Help">
-              <button className="p-1 rounded-full hover:bg-gray-100">
-                <HelpCenterIcon style={{ fontSize: '22px', color: 'gray' }} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Notifications">
-              <button className="p-1 rounded-full hover:bg-gray-100">
-                <NotificationsActiveIcon style={{ fontSize: '22px', color: 'gray' }} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Add new">
-        <button className="w-10 h-10 ">
-          <div className="bg-white rounded-full flex items-center justify-center">
-            <AddCircleIcon style={{ fontSize: '44px', color: 'blue' }} />
-          </div>
-        </button>
-      </Tooltip>
-      <button
-        className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white ml-2"
-        onClick={handleMenuOpen}
-      >
-        J
-      </button>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={handleMenuClose}>
-                <SettingsIcon className="mr-2" /> Settings
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <LogoutIcon className="mr-2" /> Logout
-              </MenuItem>
-            </Menu>
           </div>
         </div>
 
-        <div className="p-4">
-          <h2 className="text-2xl font-semibold mb-4">Hi Jagannath! Your activity list</h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold flex items-center">
-                <span className="mr-2">
-                  <i className="material-icons">check_box</i>
-                </span>
-                Tasks
-              </h2>
-              <p className="text-gray-500">0 open Tasks today</p>
-              <div className="mt-4 text-gray-500">No Task present today</div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold flex items-center">
-                <span className="mr-2">
-                  <i className="material-icons">call</i>
-                </span>
-                FollowUps
-              </h2>
-              <p className="text-gray-500">0 FollowUps scheduled today</p>
-              <div className="mt-4 text-gray-500">No FollowUp scheduled today</div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-          </div>
-
-          <h2 className="text-xl font-semibold mt-6">Recently added</h2>
-
-          <div className="mt-4 grid grid-cols-4 gap-4">
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold">Recent Contacts</h2>
-              <div className="mt-4 flex items-center">
-                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-xl font-bold">J</div>
-                <div className="ml-4">
-                  <p className="font-bold">John Doe</p>
-                  <p className="text-gray-500">MS</p>
-                  <p className="text-blue-500">Lead</p>
-                </div>
-              </div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold">Recent Sales</h2>
-              <div className="mt-4 text-gray-500">No recent sales</div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold">Recent Invoices</h2>
-              <div className="mt-4 text-gray-500">Add your first invoice</div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-
-            <div className="bg-white p-4 shadow-md rounded-md">
-              <h2 className="text-xl font-bold">Recent Payments</h2>
-              <div className="mt-4 text-gray-500">No payments received</div>
-              <a href="#" className="text-blue-500 mt-4 block">View all</a>
-            </div>
-          </div>
+        <div className="">
+          {renderComponent()}
         </div>
       </div>
     </div>

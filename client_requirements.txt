@@ -1,11 +1,122 @@
-Main features requested by the admin 
+Main features requested by the client
 
-first in first out - sale , low waiting number first , 
+when new sale is marked as completed , a small bill should be sent to the the thermal printer 58mm , 
 
-description , feed back , saakshi patram , 
+seperate section for services 
 
-when pipeline change stages also change , but field all same , stages only we can change , we should also be able to change stages
+stock updation on purchases and when parts are used for service , 
 
-one pipeline - SMAM , sale , khseerasree , general subsidy , irrigation subsidy 
+first in first out - for sale , low waiting number first ,
 
-stages - sale , supply , installation , , sale completed , feedback , demo etc , 
+description , feed back , saakshi pathram , c
+
+when pipeline change stages also change dynamically in a dropdown ,
+
+but field all same , stages only we can change , we should also be able to change stages
+
+pipelines are like - SMAM , sale , khseerasree , general subsidy , irrigation subsidy 
+
+stages - sale , supply , installation , sale completed , feedback , demo etc , 
+
+the admin should be able to add cateogry , subcateogry for pipelines stages and products as well , 
+
+products have a cateogry and a subcateogry which are not in the existing software but requested in the new software ,
+
+, billing is handled by other software with tally , 
+
+Create and track projects, sales, and deals.
+
+Upload and manage documents related to projects and clients the documents should be accesseed based on user role 
+
+Printing options for data.
+
+The company plans to implement a reward points system to evaluate and reward the performance of its sales team, including Call Attending Staff, Salesmen, and Admins. Points will be awarded as follows: one point to the salesman if a customer inquiry leads to a store visit, one point to the salesman if a product is booked in-office, and one point to the manager upon sale completion. If a customer contacts the company multiple times, the first telecalling staff and any subsequent staff handling the call or visit will each receive points. This system tracks and rewards individual contributions, identifying top performers based on accumulated points
+This system will track each employee's involvement in the sales process, allocating points for actions like logging customer inquiries and closing deals.
+ 
+Employees with higher points accumulated over time will be identified as top performers
+
+There should be a proper way to store the details and documents Related to the
+govt subsidies for for customers and they should be easily accesiblez
+
+products near stockout should be shown to admin , low moving products should also be showed to admin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+When a new sale is marked as completed, a small bill should be sent to the 58mm thermal printer.
+
+Separate section for services.
+
+Stock updates on purchases and when parts are used for service.
+
+First-In-First-Out (FIFO) for sales, prioritizing items with low waiting numbers.
+Include fields for description, feedback, and Saakshi Pathram.
+
+
+In the CRM, when changing pipeline stages, the dropdown should dynamically update while keeping fields consistent, with the ability to change stages.
+Pipelines are like SMAM , direct sale , Khseerasree, General Subsidy, and Irrigation Subsidy etc.
+Stages include Sale, Supply, Installation, Sale Completed, Feedback, Demo, etc.
+Admin should be able to add categories, subcategories for pipeline stages, and products.
+Products should have categories and subcategories, which are not available in the existing software but requested in the new software.
+Billing is handled by other software with Tally.
+Create and track projects, sales, and deals.
+Upload and manage documents related to projects and clients, with access based on user roles.
+Printing options for data.
+Implement a reward points system to evaluate and reward the performance of the sales team, including Call Attending Staff, Salesmen, and Admins. Points will be awarded as follows: one point to the salesman if a customer inquiry leads to a store visit, one point to the salesman if a product is booked in-office, and one point to the manager upon sale completion. If a customer contacts the company multiple times, the first telecalling staff and any subsequent staff handling the call or visit will each receive points. This system tracks and rewards individual contributions, identifying top performers based on accumulated points.
+There should be a proper way to store details and documents related to government subsidies for customers, ensuring they are easily accessible.
+Products nearing stockout should be shown to the admin, along with low-moving products.
+reorder the above based on sytematics for software development 
+
+Main features requested by the client, systematically ordered for software development:
+
+Sales and Billing:
+
+When a new sale is marked as completed, a small bill should be sent to the 58mm thermal printer.
+First-In-First-Out (FIFO) for sales, prioritizing items with low waiting numbers.
+Billing is handled by other software with Tally.
+Stock Management:
+
+Stock updates on purchases and when parts are used for service.
+Products nearing stockout should be shown to the admin, along with low-moving products.
+Service Management:
+
+Separate section for services.
+Include fields for description, feedback, and Saakshi Pathram.
+Customer Relationship Management (CRM):
+
+when changing pipeline stages, the dropdown should dynamically update while keeping fields consistent, with the ability to change stages.
+Pipelines include SMAM, Sale, Khseerasree, General Subsidy, and Irrigation Subsidy.
+Stages include Sale, Supply, Installation, Sale Completed, Feedback, Demo, etc.
+Admin should be able to add categories and subcategories for pipeline stages and products.
+Products should have categories and subcategories, which are not available in the existing software but requested in the new software.
+Project and Deal Tracking:
+
+Create and track projects, sales, and deals.
+Document Management:
+
+Upload and manage documents related to projects and clients, with access based on user roles.
+There should be a proper way to store details and documents related to government subsidies for customers, ensuring they are easily accessible.
+Printing:
+
+Printing options for data.
+Employee Performance and Reward System:
+
+Implement a reward points system to evaluate and reward the performance of the sales team, including Call Attending Staff, Salesmen, and Admins. Points will be awarded as follows: one point to the salesman if a customer inquiry leads to a store visit, one point to the salesman if a product is booked in-office, and one point to the manager upon sale completion. If a customer contacts the company multiple times, the first telecalling staff and any subsequent staff handling the call or visit will each receive points. This system tracks and rewards individual contributions, identifying top performers based on accumulated points.
