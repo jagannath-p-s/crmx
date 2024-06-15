@@ -106,8 +106,8 @@ const AdminPage = () => {
           isExpanded ? 'w-48' : 'w-20 items-center'
         }`}
       >
-        <div className="flex items-center justify-center mb-6 w-full">
-          <img src="https://app.zenys.org/assets/icons/icon-72x72.png" alt="Logo" className="w-10 h-10" />
+        <div className="flex items-center justify-center mt-6 mb-6 w-full">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Logo-WS.png" alt="Logo" className="w-10 h-10" />
         </div>
         <nav className={`flex flex-col w-full ${isExpanded ? 'space-y-1' : 'space-y-1 items-center'}`}>
           {navItems.map((item, index) => (

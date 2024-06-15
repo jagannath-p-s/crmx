@@ -1,4 +1,3 @@
-// Column.jsx
 import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,12 +16,12 @@ const Column = ({ column, expanded, toggleExpand }) => {
         ${expanded.includes(column.name) ? column.bgColor : 'bg-gray-100'}
         border ${expanded.includes(column.name) ? `border-${column.color}-300` : 'border-gray-300'}
         p-4 rounded-lg shadow-md relative cursor-pointer`}
-      style={{ maxHeight: '100vh', overflowY: 'auto' }}
+      style={{ maxHeight: '100vh', overflowY: 'auto', paddingRight: '8px' }}
     >
       {expanded.includes(column.name) ? (
         <>
           <div className="flex justify-between items-center mb-2">
-            <h2 className={`text-lg font-semibold text-${column.color}-600 truncate`}>
+            <h2 className={`text-lg font-semibold text-${column.color}-1600 truncate`}>
               {column.name}
             </h2>
             <button
@@ -35,13 +34,15 @@ const Column = ({ column, expanded, toggleExpand }) => {
               <ArrowDropDownIcon />
             </button>
           </div>
-          <div className="flex-grow overflow-y-auto">
+          <div className="flex-grow overflow-y-auto pr-2">
             {column.contacts.length > 0 ? (
               column.contacts.map((contact, index) => (
                 <ContactCard key={index} contact={contact} color={column.color} />
               ))
             ) : (
-              <p className="text-center text-gray-500">No contacts</p>
+              <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
+                <p className="mb-2">No contacts</p>
+              </div>
             )}
           </div>
         </>
