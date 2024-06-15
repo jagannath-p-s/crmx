@@ -5,10 +5,10 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import Column from './Column';
 
 const Contacts = () => {
-  const initialExpandedColumns = ['Lead', 'Prospect', 'Opportunity'];
+  const initialExpandedColumns = [];
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [expanded, setExpanded] = useState(initialExpandedColumns);
 
@@ -20,7 +20,7 @@ const Contacts = () => {
     if (expanded.includes(column)) {
       setExpanded(expanded.filter((c) => c !== column));
     } else {
-      if (expanded.length < 3) {
+      if (expanded.length < 4) {
         setExpanded([...expanded, column]);
       } else {
         const [first, ...rest] = expanded;
@@ -30,17 +30,31 @@ const Contacts = () => {
   };
 
   const columns = [
-    { name: 'Lead', color: 'purple' },
-    { name: 'Prospect', color: 'blue' },
-    { name: 'Opportunity', color: 'indigo' },
-    { name: 'Customer-Won', color: 'green' },
-    { name: 'Lost/Rejected', color: 'red' }
+    { name: 'Lead', color: 'purple', bgColor: 'bg-purple-50', contacts: [
+      { name: 'John Doe', contactNo: '9999999999', email: 'johndoe@gmail.com', dateCreated: '14-05-2024' },
+      { name: 'Jane Roe', contactNo: '8888888888', email: 'janeroe@gmail.com', dateCreated: '13-05-2024' },
+      { name: 'John Smith', contactNo: '7777777777', email: 'johnsmith@gmail.com', dateCreated: '12-05-2024' },
+      { name: 'Jane Smith', contactNo: '6666666666', email: 'janesmith@gmail.com', dateCreated: '11-05-2024' },
+      { name: 'John Brown', contactNo: '5555555555', email: 'johnbrown@gmail.com', dateCreated: '10-05-2024' },
+    ]},
+    { name: 'Prospect', color: 'blue', bgColor: 'bg-blue-50', contacts: [
+      { name: 'Alice Johnson', contactNo: '4444444444', email: 'alicejohnson@gmail.com', dateCreated: '09-05-2024' },
+      { name: 'Bob White', contactNo: '3333333333', email: 'bobwhite@gmail.com', dateCreated: '08-05-2024' },
+    ]},
+    { name: 'Opportunity', color: 'indigo', bgColor: 'bg-indigo-50', contacts: [] },
+    { name: 'Customer-Won', color: 'green', bgColor: 'bg-green-50', contacts: [
+      { name: 'Charlie Brown', contactNo: '2222222222', email: 'charliebrown@gmail.com', dateCreated: '07-05-2024' },
+      { name: 'Diana Prince', contactNo: '1111111111', email: 'dianaprince@gmail.com', dateCreated: '06-05-2024' },
+    ]},
+    { name: 'Lost/Rejected', color: 'red', bgColor: 'bg-red-50', contacts: [
+      { name: 'Edward Norton', contactNo: '0000000000', email: 'edwardnorton@gmail.com', dateCreated: '05-05-2024' },
+    ]}
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white shadow-md border-b border-gray-300">
+      <div className="bg-white shadow-md border-b border-t border-gray-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3">
             <div className="flex items-center space-x-4">
@@ -97,96 +111,12 @@ const Contacts = () => {
       {/* Lead Stages */}
       <div className="flex flex-grow p-4 space-x-4 overflow-x-auto">
         {columns.map((column) => (
-          <div
+          <Column
             key={column.name}
-            className={`flex flex-col transition-all duration-300 ease-in-out
-              ${expanded.includes(column.name) ? 'w-64' : 'w-16'}
-              ${expanded.includes(column.name) ? `bg-${column.color}-100` : 'bg-gray-100'}
-              border ${expanded.includes(column.name) ? `border-${column.color}-300` : 'border-gray-300'}
-              p-4 rounded-lg shadow-md relative`}
-          >
-            {expanded.includes(column.name) ? (
-              <>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className={`text-lg font-semibold text-${column.color}-600 truncate`}>
-                    {column.name}
-                  </h2>
-                  <button className="text-gray-500" onClick={() => toggleExpand(column.name)}>
-                    <ArrowDropDownIcon />
-                  </button>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  {column.name === 'Lead' && (
-                    <>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm font-bold text-purple-600">John Doe</div>
-                        <div className="flex items-center space-x-2">
-                          <button className="p-1 rounded-full hover:bg-gray-200">
-                            <i className="fas fa-plus"></i>
-                          </button>
-                          <button className="p-1 rounded-full hover:bg-gray-200">
-                            <i className="fas fa-pencil-alt"></i>
-                          </button>
-                          <button className="p-1 rounded-full hover:bg-gray-200">
-                            <i className="fas fa-comment"></i>
-                          </button>
-                          <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center">J</div>
-                        </div>
-                      </div>
-                      <p>Contact No: 9999999999</p>
-                      <p>Email: johndoe@gmail.com</p>
-                      <p>Date created: 14-05-2024</p>
-                    </>
-                  )}
-                  {column.name === 'Prospect' && (
-                    <>
-                      <p className="font-bold text-blue-600">Jane Smith</p>
-                      <p>Contact No: 8888888888</p>
-                      <p>Email: janesmith@gmail.com</p>
-                      <p>Date created: 12-05-2024</p>
-                    </>
-                  )}
-                  {column.name === 'Opportunity' && (
-                    <>
-                      <p className="font-bold text-indigo-600">Bob Johnson</p>
-                      <p>Contact No: 7777777777</p>
-                      <p>Email: bobjohnson@gmail.com</p>
-                      <p>Date created: 10-05-2024</p>
-                    </>
-                  )}
-                  {column.name === 'Customer-Won' && (
-                    <>
-                      <p className="font-bold text-green-600">Alice Brown</p>
-                      <p>Contact No: 6666666666</p>
-                      <p>Email: alicebrown@gmail.com</p>
-                      <p>Date created: 08-05-2024</p>
-                    </>
-                  )}
-                  {column.name === 'Lost/Rejected' && (
-                    <>
-                      <p className="font-bold text-red-600">Tom Wilson</p>
-                      <p>Contact No: 5555555555</p>
-                      <p>Email: tomwilson@gmail.com</p>
-                      <p>Date created: 06-05-2024</p>
-                    </>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="transform -rotate-90 whitespace-nowrap">
-                  <p className={`text-sm font-semibold text-${column.color}-600 text-center`}>
-                    {column.name}
-                  </p>
-                </div>
-              </div>
-            )}
-            {!expanded.includes(column.name) && (
-              <button className="absolute top-2 right-2 text-gray-500" onClick={() => toggleExpand(column.name)}>
-                <ArrowRightIcon />
-              </button>
-            )}
-          </div>
+            column={column}
+            expanded={expanded}
+            toggleExpand={toggleExpand}
+          />
         ))}
       </div>
     </div>

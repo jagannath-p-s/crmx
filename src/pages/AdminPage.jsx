@@ -15,8 +15,6 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
-import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 import BuildIcon from '@mui/icons-material/Build';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -104,7 +102,7 @@ const AdminPage = () => {
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`bg-white shadow-lg flex flex-col items-start py-4 px-3 border-r border-gray-200 transition-all duration-300 ${
+        className={`sticky top-0 h-screen bg-white shadow-lg flex flex-col items-start py-4 px-3 border-r border-gray-200 transition-all duration-300 ${
           isExpanded ? 'w-48' : 'w-20 items-center'
         }`}
       >
@@ -129,8 +127,9 @@ const AdminPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1">
-        <div className="bg-white shadow-md">
+      <div className="flex-1 flex flex-col">
+        {/* Topbar */}
+        <div className="sticky top-0 z-10 bg-white ">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-3">
               <div className="flex items-center space-x-4">
@@ -185,7 +184,8 @@ const AdminPage = () => {
           </div>
         </div>
 
-        <div className="">
+        {/* Main Content Area */}
+        <div >
           {renderComponent()}
         </div>
       </div>
