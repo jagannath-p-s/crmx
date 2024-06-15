@@ -105,77 +105,86 @@ const Contacts = () => {
               border ${expanded.includes(column.name) ? `border-${column.color}-300` : 'border-gray-300'}
               p-4 rounded-lg shadow-md relative`}
           >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className={`text-lg font-semibold ${expanded.includes(column.name) ? `text-${column.color}-600` : `text-${column.color}-600`} truncate`}>
-                {column.name}
-              </h2>
-              <button className="text-gray-500" onClick={() => toggleExpand(column.name)}>
-                {expanded.includes(column.name) ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-              </button>
-            </div>
             {expanded.includes(column.name) ? (
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                {column.name === 'Lead' && (
-                  <>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-bold text-purple-600">John Doe</div>
-                      <div className="flex items-center space-x-2">
-                        <button className="p-1 rounded-full hover:bg-gray-200">
-                          <i className="fas fa-plus"></i>
-                        </button>
-                        <button className="p-1 rounded-full hover:bg-gray-200">
-                          <i className="fas fa-pencil-alt"></i>
-                        </button>
-                        <button className="p-1 rounded-full hover:bg-gray-200">
-                          <i className="fas fa-comment"></i>
-                        </button>
-                        <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center">J</div>
+              <>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className={`text-lg font-semibold text-${column.color}-600 truncate`}>
+                    {column.name}
+                  </h2>
+                  <button className="text-gray-500" onClick={() => toggleExpand(column.name)}>
+                    <ArrowDropDownIcon />
+                  </button>
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  {column.name === 'Lead' && (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-bold text-purple-600">John Doe</div>
+                        <div className="flex items-center space-x-2">
+                          <button className="p-1 rounded-full hover:bg-gray-200">
+                            <i className="fas fa-plus"></i>
+                          </button>
+                          <button className="p-1 rounded-full hover:bg-gray-200">
+                            <i className="fas fa-pencil-alt"></i>
+                          </button>
+                          <button className="p-1 rounded-full hover:bg-gray-200">
+                            <i className="fas fa-comment"></i>
+                          </button>
+                          <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center">J</div>
+                        </div>
                       </div>
-                    </div>
-                    <p>Contact No: 9999999999</p>
-                    <p>Email: johndoe@gmail.com</p>
-                    <p>Date created: 14-05-2024</p>
-                  </>
-                )}
-                {column.name === 'Prospect' && (
-                  <>
-                    <p className="font-bold text-blue-600">Jane Smith</p>
-                    <p>Contact No: 8888888888</p>
-                    <p>Email: janesmith@gmail.com</p>
-                    <p>Date created: 12-05-2024</p>
-                  </>
-                )}
-                {column.name === 'Opportunity' && (
-                  <>
-                    <p className="font-bold text-indigo-600">Bob Johnson</p>
-                    <p>Contact No: 7777777777</p>
-                    <p>Email: bobjohnson@gmail.com</p>
-                    <p>Date created: 10-05-2024</p>
-                  </>
-                )}
-                {column.name === 'Customer-Won' && (
-                  <>
-                    <p className="font-bold text-green-600">Alice Brown</p>
-                    <p>Contact No: 6666666666</p>
-                    <p>Email: alicebrown@gmail.com</p>
-                    <p>Date created: 08-05-2024</p>
-                  </>
-                )}
-                {column.name === 'Lost/Rejected' && (
-                  <>
-                    <p className="font-bold text-red-600">Tom Wilson</p>
-                    <p>Contact No: 5555555555</p>
-                    <p>Email: tomwilson@gmail.com</p>
-                    <p>Date created: 06-05-2024</p>
-                  </>
-                )}
-              </div>
+                      <p>Contact No: 9999999999</p>
+                      <p>Email: johndoe@gmail.com</p>
+                      <p>Date created: 14-05-2024</p>
+                    </>
+                  )}
+                  {column.name === 'Prospect' && (
+                    <>
+                      <p className="font-bold text-blue-600">Jane Smith</p>
+                      <p>Contact No: 8888888888</p>
+                      <p>Email: janesmith@gmail.com</p>
+                      <p>Date created: 12-05-2024</p>
+                    </>
+                  )}
+                  {column.name === 'Opportunity' && (
+                    <>
+                      <p className="font-bold text-indigo-600">Bob Johnson</p>
+                      <p>Contact No: 7777777777</p>
+                      <p>Email: bobjohnson@gmail.com</p>
+                      <p>Date created: 10-05-2024</p>
+                    </>
+                  )}
+                  {column.name === 'Customer-Won' && (
+                    <>
+                      <p className="font-bold text-green-600">Alice Brown</p>
+                      <p>Contact No: 6666666666</p>
+                      <p>Email: alicebrown@gmail.com</p>
+                      <p>Date created: 08-05-2024</p>
+                    </>
+                  )}
+                  {column.name === 'Lost/Rejected' && (
+                    <>
+                      <p className="font-bold text-red-600">Tom Wilson</p>
+                      <p>Contact No: 5555555555</p>
+                      <p>Email: tomwilson@gmail.com</p>
+                      <p>Date created: 06-05-2024</p>
+                    </>
+                  )}
+                </div>
+              </>
             ) : (
-              <div className="flex items-center justify-center mt-6">
+              <div className="flex items-center justify-center h-full">
                 <div className="transform -rotate-90 whitespace-nowrap">
-                  <p className={`text-sm font-semibold text-${column.color}-600 text-center`}>{column.name}</p>
+                  <p className={`text-sm font-semibold text-${column.color}-600 text-center`}>
+                    {column.name}
+                  </p>
                 </div>
               </div>
+            )}
+            {!expanded.includes(column.name) && (
+              <button className="absolute top-2 right-2 text-gray-500" onClick={() => toggleExpand(column.name)}>
+                <ArrowRightIcon />
+              </button>
             )}
           </div>
         ))}
