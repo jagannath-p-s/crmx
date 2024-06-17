@@ -1,4 +1,6 @@
+// src/pages/AdminPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from './AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
@@ -34,6 +36,7 @@ const AdminPage = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState('Dashboard');
   const sidebarRef = useRef(null);
+  const { logout } = useAuth();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -174,7 +177,7 @@ const AdminPage = () => {
                     <SettingsOutlinedIcon className="mr-2" style={{ fontSize: '20px' }} />
                     <span className="text-sm">Settings</span>
                   </MenuItem>
-                  <MenuItem onClick={handleMenuClose} className="flex items-center">
+                  <MenuItem onClick={() => { handleMenuClose(); logout(); }} className="flex items-center">
                     <ExitToAppIcon className="mr-2" style={{ fontSize: '20px' }} />
                     <span className="text-sm">Logout</span>
                   </MenuItem>

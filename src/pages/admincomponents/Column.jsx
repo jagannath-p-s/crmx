@@ -1,19 +1,33 @@
 import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import CommentIcon from '@mui/icons-material/Comment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ContactCard from './ContactCard';
 
 const Column = ({ column, expanded, toggleExpand }) => {
+  const getTextColorClass = (color) => {
+    switch (color) {
+      case 'blue':
+        return 'text-blue-600';
+      case 'red':
+        return 'text-red-600';
+      case 'green':
+        return 'text-green-600';
+      case 'yellow':
+        return 'text-yellow-600';
+      case 'purple':
+        return 'text-purple-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
   return (
     <div
       onClick={() => toggleExpand(column.name)}
       className={`flex flex-col transition-all duration-300 ease-in-out
         ${expanded.includes(column.name) ? 'w-64' : 'w-16'}
-        ${expanded.includes(column.name) ? column.bgColor : 'bg-gray-100'}
+        ${expanded.includes(column.name) ? column.bgColor : 'bg-white'}
         border ${expanded.includes(column.name) ? `border-${column.color}-300` : 'border-gray-300'}
         p-4 rounded-lg shadow-md relative cursor-pointer`}
       style={{ maxHeight: '100vh', overflowY: 'auto', paddingRight: '8px' }}
@@ -21,7 +35,7 @@ const Column = ({ column, expanded, toggleExpand }) => {
       {expanded.includes(column.name) ? (
         <>
           <div className="flex justify-between items-center mb-2">
-            <h2 className={`text-lg font-semibold text-${column.color}-1600 truncate`}>
+            <h2 className={`text-lg font-semibold truncate ${getTextColorClass(column.color)}`}>
               {column.name}
             </h2>
             <button
@@ -49,7 +63,7 @@ const Column = ({ column, expanded, toggleExpand }) => {
       ) : (
         <div className="flex items-center justify-center h-full">
           <div className="transform -rotate-90 whitespace-nowrap">
-            <p className={`text-sm font-semibold text-${column.color}-600 text-center`}>
+            <p className={`text-sm font-semibold text-center ${getTextColorClass(column.color)}`}>
               {column.name}
             </p>
           </div>

@@ -1,9 +1,11 @@
+// src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
+import { useAuth } from './AuthContext';
 
-const supabaseUrl = 'https://tyzhqkvauoujzwxwkqsg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5emhxa3ZhdW91anp3eHdrcXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgxNzE0MDksImV4cCI6MjAzMzc0NzQwOX0.-Cvcfopgseqzk2vzmhCxvppnyEhk8RDVuqfkB67ppzU';
+const supabaseUrl = 'https://rfsqevzzlnuhifwmorxv.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmc3Fldnp6bG51aGlmd21vcnh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MTQzNDcsImV4cCI6MjAzNDE5MDM0N30._MJkIGhERKagpMran5UcAUen3gULm7JVy_evgTtHrfQ';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const LoginPage = () => {
@@ -12,6 +14,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,8 +28,6 @@ const LoginPage = () => {
         .eq('useremail', email)
         .single();
 
-      console.log('Supabase response:', data, error);
-
       if (error || !data) {
         setError('Invalid email or password');
         setLoading(false);
@@ -39,10 +40,9 @@ const LoginPage = () => {
         return;
       }
 
-      localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username, role: data.role }));
+      const userData = { id: data.id, username: data.username, role: data.role };
+      login(userData);
       setLoading(false);
-
-      console.log('User role:', data.role);
 
       switch (data.role.toLowerCase()) {
         case 'admin':
@@ -65,7 +65,6 @@ const LoginPage = () => {
           break;
       }
     } catch (error) {
-      console.error('Login error:', error);
       setError('Something went wrong, please try again');
       setLoading(false);
     }
