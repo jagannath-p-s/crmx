@@ -1,4 +1,3 @@
-// src/pages/AdminPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -30,11 +29,13 @@ import Services from './admincomponents/Services';
 import Stock from './admincomponents/Stock';
 import UploadFiles from './admincomponents/UploadFiles';
 import Documents from './admincomponents/Documents';
+import Column from './admincomponents/Column';
 
 const AdminPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState('Dashboard');
+  const [expandedColumns, setExpandedColumns] = useState(['Lead', 'Prospect', 'Opportunity']);
   const sidebarRef = useRef(null);
   const { logout } = useAuth();
 
@@ -100,6 +101,21 @@ const AdminPage = () => {
     }
   };
 
+  const toggleExpand = (columnName) => {
+    setExpandedColumns((prev) => {
+      const isExpanded = prev.includes(columnName);
+      if (isExpanded) {
+        return prev.filter((name) => name !== columnName);
+      } else {
+        if (prev.length >= 4) {
+          return [...prev.slice(1), columnName];
+        } else {
+          return [...prev, columnName];
+        }
+      }
+    });
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -132,7 +148,7 @@ const AdminPage = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Topbar */}
-        <div className="sticky top-0 z-10 bg-white ">
+        <div className="sticky top-0 z-10 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-3">
               <div className="flex items-center space-x-4">
@@ -188,7 +204,7 @@ const AdminPage = () => {
         </div>
 
         {/* Main Content Area */}
-        <div >
+        <div>
           {renderComponent()}
         </div>
       </div>

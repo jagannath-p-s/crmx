@@ -24,7 +24,7 @@ const Column = ({ column, expanded, toggleExpand }) => {
 
   return (
     <div
-      onClick={() => toggleExpand(column.name)}
+      onClick={() => !expanded.includes(column.name) && toggleExpand(column.name)}
       className={`flex flex-col transition-all duration-300 ease-in-out
         ${expanded.includes(column.name) ? 'w-64' : 'w-16'}
         ${expanded.includes(column.name) ? column.bgColor : 'bg-white'}
