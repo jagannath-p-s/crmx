@@ -24,11 +24,16 @@ import {
 } from '@mui/icons-material';
 import { saveAs } from 'file-saver';
 import { format, parseISO, isValid } from 'date-fns';
+import './Activities.css'; // Import the CSS file
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70 },
   { field: 'description', headerName: 'Description', width: 200 },
-  { field: 'date', headerName: 'Date', width: 130, valueFormatter: ({ value }) => (isValid(parseISO(value)) ? format(parseISO(value), 'dd-MM-yyyy') : 'Invalid date') },
+  { field: 'date', headerName: 'Date', width: 130, valueFormatter: ({ value }) => {
+    if (!value) return 'Invalid date';
+    const parsedDate = parseISO(value);
+    return isValid(parsedDate) ? format(parsedDate, 'dd-MM-yyyy') : 'Invalid date';
+  }},
 ];
 
 const initialRows = [
@@ -97,7 +102,7 @@ const Activities = () => {
   );
 
   return (
-    <Paper className="p-6" elevation={3} sx={{ borderRadius: 2 }}>
+    <Paper className="p-6 m-6" elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
       <div className="mb-6 flex flex-wrap justify-between items-center gap-4">
         <TextField
           label="Search"
@@ -130,6 +135,18 @@ const Activities = () => {
           checkboxSelection
           onSelectionModelChange={(newSelection) => {
             setSelectedRows(newSelection);
+          }}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              borderBottom: '1px solid #e0e0e0',
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#f5f5f5',
+              borderBottom: '1px solid #e0e0e0',
+            },
+            '& .MuiDataGrid-footerContainer': {
+              borderTop: '1px solid #e0e0e0',
+            },
           }}
         />
       </div>
