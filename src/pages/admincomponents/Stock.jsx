@@ -103,7 +103,7 @@ const Stock = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white shadow-md border-t-4 border-blue-500 border-b border-gray-300">
+      <div className="bg-white shadow-md border-t-2 border-blue-500 border-b border-gray-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3">
             <div className="flex items-center space-x-4">

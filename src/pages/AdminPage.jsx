@@ -6,7 +6,6 @@ import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddIcon from '@mui/icons-material/Add';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
@@ -17,18 +16,17 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import BuildIcon from '@mui/icons-material/Build';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import StorageIcon from '@mui/icons-material/Storage';
+import BusinessIcon from '@mui/icons-material/Business';
 
 import Contacts from './admincomponents/Contacts';
 import Sales from './admincomponents/Sales';
 import Activities from './admincomponents/Activities';
 import Dashboard from './admincomponents/Dashboard';
-import Products from './admincomponents/Products';
 import Services from './admincomponents/Services';
 import Stock from './admincomponents/Stock';
 import UploadFiles from './admincomponents/UploadFiles';
-import Documents from './admincomponents/Documents';
+import Organisation from './admincomponents/Organisation';
 import Column from './admincomponents/Column';
 
 const AdminPage = () => {
@@ -69,11 +67,10 @@ const AdminPage = () => {
     { icon: <ShoppingBagOutlinedIcon />, tooltip: "Sales", component: 'Sales' },
     { icon: <EventNoteIcon />, tooltip: "Activities", component: 'Activities' },
     { icon: <EqualizerIcon />, tooltip: "Dashboard", component: 'Dashboard' },
-    { icon: <ShoppingBasketIcon />, tooltip: "Products", component: 'Products' },
-    { icon: <BuildIcon />, tooltip: "Services", component: 'Services' },
     { icon: <StorageIcon />, tooltip: "Stock", component: 'Stock' },
-    { icon: <CloudUploadOutlinedIcon />, tooltip: "Upload Files", component: 'UploadFiles' },
-    { icon: <InsertDriveFileOutlinedIcon />, tooltip: "Documents", component: 'Documents' }
+    { icon: <BuildIcon />, tooltip: "Services", component: 'Services' },
+    { icon: <BusinessIcon />, tooltip: "Organisation", component: 'Organisation' },
+    { icon: <CloudUploadOutlinedIcon />, tooltip: "Upload Files", component: 'UploadFiles' }
   ];
 
   const renderComponent = () => {
@@ -86,16 +83,14 @@ const AdminPage = () => {
         return <Activities />;
       case 'Dashboard':
         return <Dashboard />;
-      case 'Products':
-        return <Products />;
-      case 'Services':
-        return <Services />;
       case 'Stock':
         return <Stock />;
+      case 'Services':
+        return <Services />;
+      case 'Organisation':
+        return <Organisation />;
       case 'UploadFiles':
         return <UploadFiles />;
-      case 'Documents':
-        return <Documents />;
       default:
         return <Dashboard />;
     }

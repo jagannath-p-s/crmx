@@ -5,19 +5,13 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Column from './Column';
 import TableView from './TableView';
 
 const Contacts = () => {
   const initialExpandedColumns = [];
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [expanded, setExpanded] = useState(initialExpandedColumns);
   const [view, setView] = useState('cards'); // 'cards' or 'table'
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
 
   const toggleExpand = (column) => {
     if (expanded.includes(column)) {
@@ -72,30 +66,6 @@ const Contacts = () => {
               <div className="flex items-center">
                 <PeopleOutlineIcon className="text-blue-500" style={{ fontSize: '1.75rem' }} />
                 <h1 className="text-xl font-semibold ml-2">Contacts</h1>
-              </div>
-              <div className="relative">
-                <button
-                  className="flex items-center bg-gray-200 p-2 rounded-lg"
-                  onClick={toggleDropdown}
-                >
-                  To be converted
-                  <ArrowDropDownIcon className="ml-2" />
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute mt-2 w-56 bg-white border rounded-lg shadow-lg z-10">
-                    <ul className="py-2">
-                      <li className="px-4 py-2 hover:bg-gray-100">Default View</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">To be converted</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">Created today</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">Created this week</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">Created this month</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">To be contacted today</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">To be contacted tomorrow</li>
-                      <li className="px-4 py-2 hover:bg-gray-100">By next contact date</li>
-                      <li className="px-4 py-2 text-blue-600 hover:bg-gray-100">+ Create New</li>
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">

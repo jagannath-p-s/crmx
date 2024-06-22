@@ -1,7 +1,6 @@
 import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import ContactCard from './ContactCard';
 
 const Column = ({ column, expanded, toggleExpand }) => {
@@ -38,15 +37,17 @@ const Column = ({ column, expanded, toggleExpand }) => {
             <h2 className={`text-lg font-semibold truncate ${getTextColorClass(column.color)}`}>
               {column.name}
             </h2>
-            <button
-              className="text-gray-500"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleExpand(column.name);
-              }}
-            >
-              <ArrowDropDownIcon />
-            </button>
+            <Tooltip title="Collapse">
+              <button
+                className="text-gray-500 transform rotate-90"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleExpand(column.name);
+                }}
+              >
+                <KeyboardDoubleArrowRightIcon />
+              </button>
+            </Tooltip>
           </div>
           <div className="flex-grow overflow-y-auto pr-2">
             {column.contacts.length > 0 ? (
@@ -67,15 +68,17 @@ const Column = ({ column, expanded, toggleExpand }) => {
               {column.name}
             </p>
           </div>
-          <button
-            className="absolute top-2 right-2 text-gray-500"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleExpand(column.name);
-            }}
-          >
-            <ArrowRightIcon />
-          </button>
+          <Tooltip title="Expand">
+            <button
+              className="absolute top-2 right-2 text-gray-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpand(column.name);
+              }}
+            >
+              <KeyboardDoubleArrowRightIcon />
+            </button>
+          </Tooltip>
         </div>
       )}
     </div>

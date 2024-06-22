@@ -134,148 +134,152 @@ const TableView = ({ columns }) => {
   };
 
   return (
-    <Box sx={{ width: '100%', overflowX: 'auto' }}>
-      <Paper elevation={3} sx={{ borderRadius: 2, mb: 3 }}>
-        <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
-          <Box sx={{ p: 3, bgcolor: '#ffffff', mb: 2, minWidth: 1200 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                <TextField
-                  label="Name"
-                  name="name"
-                  variant="outlined"
-                  size="small"
-                  value={filters.name}
+    <Box sx={{ width: '100%' }}>
+      <Paper  sx={{ borderRadius: 2,  position: 'sticky', top: 0, zIndex: 1 }}>
+        <Box sx={{ p: 3, bgcolor: '#ffffff', minWidth: 1200 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <TextField
+                label="Name"
+                name="name"
+                variant="outlined"
+                size="small"
+                value={filters.name}
+                onChange={handleFilterChange}
+                sx={{ width: '150px' }}
+              />
+              <TextField
+                label="Mobile No"
+                name="contactNo"
+                variant="outlined"
+                size="small"
+                value={filters.contactNo}
+                onChange={handleFilterChange}
+                sx={{ width: '150px' }}
+              />
+              <FormControl variant="outlined" size="small" sx={{ width: '150px' }}>
+                <InputLabel>Stage</InputLabel>
+                <Select
+                  value={filters.stage}
+                  name="stage"
                   onChange={handleFilterChange}
-                  sx={{ width: '150px' }}
-                />
-                <TextField
-                  label="Mobile No"
-                  name="contactNo"
-                  variant="outlined"
-                  size="small"
-                  value={filters.contactNo}
-                  onChange={handleFilterChange}
-                  sx={{ width: '150px' }}
-                />
-                <FormControl variant="outlined" size="small" sx={{ width: '150px' }}>
-                  <InputLabel>Stage</InputLabel>
-                  <Select
-                    value={filters.stage}
-                    name="stage"
-                    onChange={handleFilterChange}
-                    label="Stage"
-                  >
-                    <MenuItem value="">All Stages</MenuItem>
-                    {columns.map(column => (
-                      <MenuItem key={column.name} value={column.name}>{column.name}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <TextField
-                  label="From Date"
-                  name="dateFrom"
-                  variant="outlined"
-                  size="small"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  value={filters.dateFrom}
-                  onChange={handleFilterChange}
-                  sx={{ width: '150px' }}
-                />
-                <TextField
-                  label="To Date"
-                  name="dateTo"
-                  variant="outlined"
-                  size="small"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  value={filters.dateTo}
-                  onChange={handleFilterChange}
-                  sx={{ width: '150px' }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<ClearIcon />}
-                  onClick={handleClearFilters}
+                  label="Stage"
                 >
-                  Clear
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<DownloadIcon />}
-                  onClick={handleDownload}
-                >
-                  Download
-                </Button>
-              </Box>
+                  <MenuItem value="">All Stages</MenuItem>
+                  {columns.map(column => (
+                    <MenuItem key={column.name} value={column.name}>{column.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                label="From Date"
+                name="dateFrom"
+                variant="outlined"
+                size="small"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={filters.dateFrom}
+                onChange={handleFilterChange}
+                sx={{ width: '150px' }}
+              />
+              <TextField
+                label="To Date"
+                name="dateTo"
+                variant="outlined"
+                size="small"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={filters.dateTo}
+                onChange={handleFilterChange}
+                sx={{ width: '150px' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="outlined"
+                startIcon={<ClearIcon />}
+                onClick={handleClearFilters}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownload}
+              >
+                Download
+              </Button>
             </Box>
           </Box>
-          <TableContainer component={Paper}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={selectedRows.length > 0 && selectedRows.length < paginatedData.length}
-                      checked={paginatedData.length > 0 && selectedRows.length === paginatedData.length}
-                      onChange={handleSelectAllRows}
-                    />
-                  </TableCell>
-                  <TableCell>Actions</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Code</TableCell>
-                  <TableCell>Contact Number</TableCell>
-                  <TableCell>Date Created</TableCell>
-                  <TableCell>Priority</TableCell>
-                  <TableCell>Pipeline</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Assigned To</TableCell>
-                  <TableCell>Lead Source</TableCell>
-                  <TableCell>Invoiced</TableCell>
-                  <TableCell>Collected</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedData.length > 0 ? paginatedData.map((contact, index) => (
-                  <TableRow key={index} hover selected={isSelected(contact)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected(contact)}
-                        onChange={() => handleSelectRow(contact)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={(event) => handleMenuOpen(event, contact)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                    <TableCell><a href="#" className="text-blue-500">{contact.name}</a></TableCell>
-                    <TableCell>{contact.code}</TableCell>
-                    <TableCell>{contact.contactNo}</TableCell>
-                    <TableCell>
-                      {isValid(parseISO(contact.dateCreated)) ? format(parseISO(contact.dateCreated), 'dd-MM-yyyy') : 'Invalid date'}
-                    </TableCell>
-                    <TableCell>{contact.priority}</TableCell>
-                    <TableCell>{contact.pipeline}</TableCell>
-                    <TableCell>{contact.status}</TableCell>
-                    <TableCell>{contact.assignedTo}</TableCell>
-                    <TableCell>{contact.leadSource}</TableCell>
-                    <TableCell>{contact.invoiced ? 'Yes' : 'No'}</TableCell>
-                    <TableCell>{contact.collected ? 'Yes' : 'No'}</TableCell>
-                  </TableRow>
-                )) : (
-                  <TableRow>
-                    <TableCell colSpan={13} align="center">No contacts found</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </Box>
       </Paper>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+        <Paper elevation={3} sx={{ borderRadius: 2, mb: 3 }}>
+          <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
+            <TableContainer component={Paper}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        indeterminate={selectedRows.length > 0 && selectedRows.length < paginatedData.length}
+                        checked={paginatedData.length > 0 && selectedRows.length === paginatedData.length}
+                        onChange={handleSelectAllRows}
+                      />
+                    </TableCell>
+                    <TableCell>Actions</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Code</TableCell>
+                    <TableCell>Contact Number</TableCell>
+                    <TableCell>Date Created</TableCell>
+                    <TableCell>Priority</TableCell>
+                    <TableCell>Pipeline</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Assigned To</TableCell>
+                    <TableCell>Lead Source</TableCell>
+                    <TableCell>Invoiced</TableCell>
+                    <TableCell>Collected</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedData.length > 0 ? paginatedData.map((contact, index) => (
+                    <TableRow key={index} hover selected={isSelected(contact)}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={isSelected(contact)}
+                          onChange={() => handleSelectRow(contact)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={(event) => handleMenuOpen(event, contact)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell><a href="#" className="text-blue-500">{contact.name}</a></TableCell>
+                      <TableCell>{contact.code}</TableCell>
+                      <TableCell>{contact.contactNo}</TableCell>
+                      <TableCell>
+                        {isValid(parseISO(contact.dateCreated)) ? format(parseISO(contact.dateCreated), 'dd-MM-yyyy') : 'Invalid date'}
+                      </TableCell>
+                      <TableCell>{contact.priority}</TableCell>
+                      <TableCell>{contact.pipeline}</TableCell>
+                      <TableCell>{contact.status}</TableCell>
+                      <TableCell>{contact.assignedTo}</TableCell>
+                      <TableCell>{contact.leadSource}</TableCell>
+                      <TableCell>{contact.invoiced ? 'Yes' : 'No'}</TableCell>
+                      <TableCell>{contact.collected ? 'Yes' : 'No'}</TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={13} align="center">No contacts found</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Paper>
+      </Box>
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
         <Typography variant="body2" sx={{ mr: 2 }}>
           {`${(currentPage - 1) * rowsPerPage + 1}-${Math.min(currentPage * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
