@@ -4,14 +4,11 @@ import {
   Container,
   Typography,
   TextField,
-  Button,  // Ensure Button is imported here
+  Button,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  Grid,
-  Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -30,22 +27,24 @@ import {
   Link,
   ListItemText,
   ListItemIcon,
+  Alert,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
   Settings as SettingsIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon,
   Business as BusinessIcon,
-  PersonAddAlt as PersonAddAltIcon, // Changed the Add icon
+  PersonAddAlt as PersonAddAltIcon,
+  Edit as EditIcon,
+  VpnKey as VpnKeyIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 
 const Organisation = () => {
   const [staff, setStaff] = useState({
     username: '',
     useremail: '',
-    password: '',
-    role: 'admin',
+    role: 'salesman',
     mobile_number: '',
     address: '',
     phone_number: '',
@@ -56,8 +55,10 @@ const Organisation = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
     fetchStaff();
@@ -66,8 +67,8 @@ const Organisation = () => {
   const fetchStaff = async () => {
     const { data, error } = await supabase.from('users').select('*');
     if (error) {
-      console.error(error);
-      setSnackbar({ open: true, message: 'Error fetching staff list' });
+      console.error('Error fetching staff:', error);
+      showSnackbar(`Error fetching staff: ${error.message}`, 'error');
     } else {
       setStaffList(data);
     }
@@ -80,24 +81,69 @@ const Organisation = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.from('users').insert([staff]);
+    if (dialogType === 'edit' && !selectedRecord) {
+      showSnackbar('No staff member selected for editing', 'error');
+      return;
+    }
+    
+    let result;
+    if (dialogType === 'add') {
+      result = await supabase.from('users').insert([staff]);
+    } else if (dialogType === 'edit') {
+      result = await supabase
+        .from('users')
+        .update(staff)
+        .eq('id', selectedRecord.id);
+    }
+
+    const { error } = result;
     if (error) {
-      console.error(error);
-      setSnackbar({ open: true, message: 'Error adding staff member' });
+      console.error(`Error ${dialogType === 'add' ? 'adding' : 'updating'} staff:`, error);
+      showSnackbar(`Error ${dialogType === 'add' ? 'adding' : 'updating'} staff: ${error.message}`, 'error');
     } else {
-      setStaffList([...staffList, data[0]]);
-      setStaff({
-        username: '',
-        useremail: '',
-        password: '',
-        role: 'admin',
-        mobile_number: '',
-        address: '',
-        phone_number: '',
-        resume_link: '',
-      });
-      setSnackbar({ open: true, message: 'Staff member added successfully' });
-      handleAddDialogClose();
+      await fetchStaff();
+      resetStaffForm();
+      showSnackbar(`Staff member ${dialogType === 'add' ? 'added' : 'updated'} successfully`, 'success');
+      handleDialogClose();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedRecord) {
+      showSnackbar('No staff member selected for deletion', 'error');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', selectedRecord.id);
+    if (error) {
+      console.error('Error deleting staff:', error);
+      showSnackbar(`Error deleting staff: ${error.message}`, 'error');
+    } else {
+      await fetchStaff();
+      showSnackbar('Staff member deleted successfully', 'success');
+      handleMenuClose();
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!selectedRecord) {
+      showSnackbar('No staff member selected for password change', 'error');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('users')
+      .update({ password: newPassword })
+      .eq('id', selectedRecord.id);
+    if (error) {
+      console.error('Error changing password:', error);
+      showSnackbar(`Error changing password: ${error.message}`, 'error');
+    } else {
+      showSnackbar('Password changed successfully', 'success');
+      handleDialogClose();
     }
   };
 
@@ -108,38 +154,57 @@ const Organisation = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedRecord(null);
   };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredStaffList = staffList.filter((staff) =>
-    staff.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    staff.useremail.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStaffList = staffList.filter(
+    (staff) =>
+      staff.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      staff.useremail.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddDialogOpen = () => {
-    setAddDialogOpen(true);
+  const handleDialogOpen = (type) => {
+    setDialogType(type);
+    if (type === 'edit' && selectedRecord) {
+      setStaff(selectedRecord);
+    } else if (type === 'changePassword') {
+      setNewPassword('');
+    }
+    setDialogOpen(true);
+    handleMenuClose();
   };
 
-  const handleAddDialogClose = () => {
-    setAddDialogOpen(false);
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    resetStaffForm();
+    setSelectedRecord(null); // Reset selectedRecord after closing the dialog
   };
 
-  const handleCloseSnackbar = () => {
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleEdit = () => {
-    console.log('Editing:', selectedRecord);
-    handleMenuClose();
-  };
-
-  const handleDelete = () => {
-    setStaffList(staffList.filter((record) => record !== selectedRecord));
-    handleMenuClose();
+  const resetStaffForm = () => {
+    setStaff({
+      username: '',
+      useremail: '',
+      role: 'salesman',
+      mobile_number: '',
+      address: '',
+      phone_number: '',
+      resume_link: '',
+    });
+    setNewPassword('');
   };
 
   return (
@@ -167,7 +232,7 @@ const Organisation = () => {
               <Tooltip title="Add new staff">
                 <IconButton
                   className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
-                  onClick={handleAddDialogOpen}
+                  onClick={() => handleDialogOpen('add')}
                 >
                   <PersonAddAltIcon style={{ fontSize: '1.75rem' }} />
                 </IconButton>
@@ -181,7 +246,7 @@ const Organisation = () => {
           </div>
         </div>
       </div>
-
+  
       {/* Content */}
       <div className="flex-grow p-4 space-x-4 overflow-x-auto">
         <TableContainer component={Paper} className="shadow-md sm:rounded-lg overflow-auto">
@@ -200,23 +265,25 @@ const Organisation = () => {
             </TableHead>
             <TableBody>
               {filteredStaffList.length > 0 ? (
-                filteredStaffList.map((staff, index) => (
-                  <TableRow key={index} className="bg-white border-b">
+                filteredStaffList.map((staffMember) => (
+                  <TableRow key={staffMember.id} className="bg-white border-b">
                     <TableCell>
-                      <IconButton onClick={(event) => handleMenuOpen(event, staff)}>
+                      <IconButton onClick={(event) => handleMenuOpen(event, staffMember)}>
                         <MoreVertIcon />
                       </IconButton>
                     </TableCell>
-                    <TableCell>{staff.username}</TableCell>
-                    <TableCell>{staff.useremail}</TableCell>
-                    <TableCell>{staff.role}</TableCell>
-                    <TableCell>{staff.mobile_number}</TableCell>
-                    <TableCell>{staff.phone_number}</TableCell>
-                    <TableCell>{staff.address}</TableCell>
+                    <TableCell>{staffMember.username}</TableCell>
+                    <TableCell>{staffMember.useremail}</TableCell>
+                    <TableCell>{staffMember.role}</TableCell>
+                    <TableCell>{staffMember.mobile_number}</TableCell>
+                    <TableCell>{staffMember.phone_number}</TableCell>
+                    <TableCell>{staffMember.address}</TableCell>
                     <TableCell>
-                      <Link href={staff.resume_link} target="_blank" rel="noopener">
-                        View Resume
-                      </Link>
+                      {staffMember.resume_link && (
+                        <Link href={staffMember.resume_link} target="_blank" rel="noopener">
+                          View Resume
+                        </Link>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -231,13 +298,19 @@ const Organisation = () => {
           </Table>
         </TableContainer>
       </div>
-
+  
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={handleEdit} sx={{ padding: '12px 20px' }}>
+        <MenuItem onClick={() => handleDialogOpen('edit')} sx={{ padding: '12px 20px' }}>
           <ListItemIcon>
             <EditIcon fontSize="small" sx={{ fontSize: '20px' }} />
           </ListItemIcon>
-          <ListItemText primary="Edit" />
+          <ListItemText primary="Edit record" />
+        </MenuItem>
+        <MenuItem onClick={() => handleDialogOpen('changePassword')} sx={{ padding: '12px 20px' }}>
+          <ListItemIcon>
+            <VpnKeyIcon fontSize="small" sx={{ fontSize: '20px' }} />
+          </ListItemIcon>
+          <ListItemText primary="Change password" />
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ padding: '12px 20px' }}>
           <ListItemIcon>
@@ -246,110 +319,119 @@ const Organisation = () => {
           <ListItemText primary="Delete record" />
         </MenuItem>
       </Menu>
-
-      <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-        <DialogTitle>Add New Staff Member</DialogTitle>
+  
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>{dialogType === 'add' ? 'Add New Staff Member' : dialogType === 'edit' ? 'Edit Staff Member' : 'Change Password'}</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Username"
-            name="username"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.username}
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Email"
-            name="useremail"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.useremail}
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Password"
-            name="password"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            type="password"
-            value={staff.password}
-            onChange={handleChange}
-            required
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Role</InputLabel>
-            <Select
-              name="role"
-              value={staff.role}
-              onChange={handleChange}
-              label="Role"
-            >
-              <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="manager">Manager</MenuItem>
-              <MenuItem value="salesman">Salesman</MenuItem>
-              <MenuItem value="service">Service</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Mobile Number"
-            name="mobile_number"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.mobile_number}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Phone Number"
-            name="phone_number"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.phone_number}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Address"
-            name="address"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            multiline
-            rows={2}
-            value={staff.address}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Resume Link"
-            name="resume_link"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.resume_link}
-            onChange={handleChange}
-          />
+          {dialogType !== 'changePassword' && (
+            <>
+              <TextField
+                label="Username"
+                name="username"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.username}
+                onChange={handleChange}
+                required
+              />
+              <TextField
+                label="Email"
+                name="useremail"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.useremail}
+                onChange={handleChange}
+                required
+              />
+              <FormControl fullWidth margin="dense">
+                <InputLabel>Role</InputLabel>
+                <Select
+                  name="role"
+                  value={staff.role}
+                  onChange={handleChange}
+                  label="Role"
+                >
+                  <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="manager">Manager</MenuItem>
+                  <MenuItem value="salesman">Salesman</MenuItem>
+                  <MenuItem value="service">Service</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Mobile Number"
+                name="mobile_number"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.mobile_number}
+                onChange={handleChange}
+              />
+              <TextField
+                label="Phone Number"
+                name="phone_number"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.phone_number}
+                onChange={handleChange}
+              />
+              <TextField
+                label="Address"
+                name="address"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                multiline
+                rows={2}
+                value={staff.address}
+                onChange={handleChange}
+              />
+              <TextField
+                label="Resume Link"
+                name="resume_link"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.resume_link}
+                onChange={handleChange}
+              />
+            </>
+          )}
+          {dialogType === 'changePassword' && (
+            <TextField
+              label="New Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleAddDialogClose} color="primary">
+          <Button onClick={handleDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Add Staff
+          <Button onClick={dialogType === 'changePassword' ? handleChangePassword : handleSubmit} color="primary">
+            {dialogType === 'add' ? 'Add Staff' : dialogType === 'edit' ? 'Update Staff' : 'Change Password'}
           </Button>
         </DialogActions>
       </Dialog>
-
+  
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        message={snackbar.message}
-      />
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
