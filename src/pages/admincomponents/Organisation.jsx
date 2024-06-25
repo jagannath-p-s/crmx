@@ -42,6 +42,7 @@ import {
 const initialStaffState = {
   username: '',
   useremail: '',
+  password: '',  // Added password field to the initial state
   role: 'salesman',
   mobile_number: '',
   address: '',
@@ -89,9 +90,10 @@ const Organisation = () => {
     if (dialogType === 'add') {
       result = await supabase.from('users').insert([staff]);
     } else if (dialogType === 'edit') {
+      const { password, ...updatedStaff } = staff;  // Exclude password when editing
       result = await supabase
         .from('users')
-        .update(staff)
+        .update(updatedStaff)
         .eq('id', selectedRecord.id);
     }
 
@@ -150,6 +152,8 @@ const Organisation = () => {
     setDialogType(type);
     if (type === 'edit' && selectedRecord) {
       setStaff(selectedRecord);
+    } else if (type === 'add') {
+      resetStaffForm();
     }
     setDialogOpen(true);
     handleMenuClose();
@@ -215,7 +219,7 @@ const Organisation = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Content */}
       <div className="flex-grow p-4 space-x-4 overflow-x-auto">
         <TableContainer component={Paper} className="shadow-md sm:rounded-lg overflow-auto">
@@ -267,7 +271,7 @@ const Organisation = () => {
           </Table>
         </TableContainer>
       </div>
-  
+
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => handleDialogOpen('edit')} sx={{ padding: '12px 20px' }}>
           <ListItemIcon>
@@ -282,7 +286,7 @@ const Organisation = () => {
           <ListItemText primary="Delete record" />
         </MenuItem>
       </Menu>
-  
+
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>{dialogType === 'add' ? 'Add New Staff Member' : 'Edit Staff Member'}</DialogTitle>
         <DialogContent>
@@ -306,6 +310,19 @@ const Organisation = () => {
             onChange={handleChange}
             required
           />
+          {dialogType === 'add' && (
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              value={staff.password}
+              onChange={handleChange}
+              required
+            />
+          )}
           <FormControl fullWidth margin="dense">
             <InputLabel>Role</InputLabel>
             <Select
@@ -368,7 +385,7 @@ const Organisation = () => {
           </Button>
         </DialogActions>
       </Dialog>
-  
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
