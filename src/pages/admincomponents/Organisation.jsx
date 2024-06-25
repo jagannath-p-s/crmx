@@ -36,21 +36,21 @@ import {
   Business as BusinessIcon,
   PersonAddAlt as PersonAddAltIcon,
   Edit as EditIcon,
-  VpnKey as VpnKeyIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
 
-const Organisation = () => {
-  const [staff, setStaff] = useState({
-    username: '',
-    useremail: '',
-    role: 'salesman',
-    mobile_number: '',
-    address: '',
-    phone_number: '',
-    resume_link: '',
-  });
+const initialStaffState = {
+  username: '',
+  useremail: '',
+  role: 'salesman',
+  mobile_number: '',
+  address: '',
+  phone_number: '',
+  resume_link: '',
+};
 
+const Organisation = () => {
+  const [staff, setStaff] = useState(initialStaffState);
   const [staffList, setStaffList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
@@ -58,7 +58,6 @@ const Organisation = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
     fetchStaff();
@@ -85,7 +84,7 @@ const Organisation = () => {
       showSnackbar('No staff member selected for editing', 'error');
       return;
     }
-    
+
     let result;
     if (dialogType === 'add') {
       result = await supabase.from('users').insert([staff]);
@@ -113,7 +112,7 @@ const Organisation = () => {
       showSnackbar('No staff member selected for deletion', 'error');
       return;
     }
-    
+
     const { error } = await supabase
       .from('users')
       .delete()
@@ -125,25 +124,6 @@ const Organisation = () => {
       await fetchStaff();
       showSnackbar('Staff member deleted successfully', 'success');
       handleMenuClose();
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!selectedRecord) {
-      showSnackbar('No staff member selected for password change', 'error');
-      return;
-    }
-    
-    const { error } = await supabase
-      .from('users')
-      .update({ password: newPassword })
-      .eq('id', selectedRecord.id);
-    if (error) {
-      console.error('Error changing password:', error);
-      showSnackbar(`Error changing password: ${error.message}`, 'error');
-    } else {
-      showSnackbar('Password changed successfully', 'success');
-      handleDialogClose();
     }
   };
 
@@ -170,8 +150,6 @@ const Organisation = () => {
     setDialogType(type);
     if (type === 'edit' && selectedRecord) {
       setStaff(selectedRecord);
-    } else if (type === 'changePassword') {
-      setNewPassword('');
     }
     setDialogOpen(true);
     handleMenuClose();
@@ -180,7 +158,7 @@ const Organisation = () => {
   const handleDialogClose = () => {
     setDialogOpen(false);
     resetStaffForm();
-    setSelectedRecord(null); // Reset selectedRecord after closing the dialog
+    setSelectedRecord(null);
   };
 
   const showSnackbar = (message, severity) => {
@@ -195,16 +173,7 @@ const Organisation = () => {
   };
 
   const resetStaffForm = () => {
-    setStaff({
-      username: '',
-      useremail: '',
-      role: 'salesman',
-      mobile_number: '',
-      address: '',
-      phone_number: '',
-      resume_link: '',
-    });
-    setNewPassword('');
+    setStaff(initialStaffState);
   };
 
   return (
@@ -306,12 +275,6 @@ const Organisation = () => {
           </ListItemIcon>
           <ListItemText primary="Edit record" />
         </MenuItem>
-        <MenuItem onClick={() => handleDialogOpen('changePassword')} sx={{ padding: '12px 20px' }}>
-          <ListItemIcon>
-            <VpnKeyIcon fontSize="small" sx={{ fontSize: '20px' }} />
-          </ListItemIcon>
-          <ListItemText primary="Change password" />
-        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ padding: '12px 20px' }}>
           <ListItemIcon>
             <DeleteIcon fontSize="small" sx={{ fontSize: '20px' }} />
@@ -321,103 +284,87 @@ const Organisation = () => {
       </Menu>
   
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>{dialogType === 'add' ? 'Add New Staff Member' : dialogType === 'edit' ? 'Edit Staff Member' : 'Change Password'}</DialogTitle>
+        <DialogTitle>{dialogType === 'add' ? 'Add New Staff Member' : 'Edit Staff Member'}</DialogTitle>
         <DialogContent>
-          {dialogType !== 'changePassword' && (
-            <>
-              <TextField
-                label="Username"
-                name="username"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={staff.username}
-                onChange={handleChange}
-                required
-              />
-              <TextField
-                label="Email"
-                name="useremail"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={staff.useremail}
-                onChange={handleChange}
-                required
-              />
-              <FormControl fullWidth margin="dense">
-                <InputLabel>Role</InputLabel>
-                <Select
-                  name="role"
-                  value={staff.role}
-                  onChange={handleChange}
-                  label="Role"
-                >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="manager">Manager</MenuItem>
-                  <MenuItem value="salesman">Salesman</MenuItem>
-                  <MenuItem value="service">Service</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Mobile Number"
-                name="mobile_number"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={staff.mobile_number}
-                onChange={handleChange}
-              />
-              <TextField
-                label="Phone Number"
-                name="phone_number"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={staff.phone_number}
-                onChange={handleChange}
-              />
-              <TextField
-                label="Address"
-                name="address"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                multiline
-                rows={2}
-                value={staff.address}
-                onChange={handleChange}
-              />
-              <TextField
-                label="Resume Link"
-                name="resume_link"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={staff.resume_link}
-                onChange={handleChange}
-              />
-            </>
-          )}
-          {dialogType === 'changePassword' && (
-            <TextField
-              label="New Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="dense"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-          )}
+          <TextField
+            label="Username"
+            name="username"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={staff.username}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            label="Email"
+            name="useremail"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={staff.useremail}
+            onChange={handleChange}
+            required
+          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Role</InputLabel>
+            <Select
+              name="role"
+              value={staff.role}
+              onChange={handleChange}
+              label="Role"
+            >
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="manager">Manager</MenuItem>
+              <MenuItem value="salesman">Salesman</MenuItem>
+              <MenuItem value="service">Service</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Mobile Number"
+            name="mobile_number"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={staff.mobile_number}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Phone Number"
+            name="phone_number"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={staff.phone_number}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Address"
+            name="address"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            multiline
+            rows={2}
+            value={staff.address}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Resume Link"
+            name="resume_link"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={staff.resume_link}
+            onChange={handleChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={dialogType === 'changePassword' ? handleChangePassword : handleSubmit} color="primary">
-            {dialogType === 'add' ? 'Add Staff' : dialogType === 'edit' ? 'Update Staff' : 'Change Password'}
+          <Button onClick={handleSubmit} color="primary">
+            {dialogType === 'add' ? 'Add Staff' : 'Update Staff'}
           </Button>
         </DialogActions>
       </Dialog>
