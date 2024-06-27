@@ -35,7 +35,7 @@ const AdminPage = () => {
   const [activeComponent, setActiveComponent] = useState('Dashboard');
   const [expandedColumns, setExpandedColumns] = useState(['Lead', 'Prospect', 'Opportunity']);
   const sidebarRef = useRef(null);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

@@ -31,23 +31,22 @@ import {
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
-  Settings as SettingsIcon,
   Delete as DeleteIcon,
   Business as BusinessIcon,
   PersonAddAlt as PersonAddAltIcon,
   Edit as EditIcon,
-  Close as CloseIcon,
+  Lock as LockIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 
 const initialStaffState = {
   username: '',
   useremail: '',
-  password: '',  // Added password field to the initial state
-  role: 'salesman',
+  password: '',
+  role: 'Salesman',
   mobile_number: '',
   address: '',
   phone_number: '',
-  resume_link: '',
 };
 
 const Organisation = () => {
@@ -67,10 +66,13 @@ const Organisation = () => {
   const fetchStaff = async () => {
     const { data, error } = await supabase.from('users').select('*');
     if (error) {
-      console.error('Error fetching staff:', error);
       showSnackbar(`Error fetching staff: ${error.message}`, 'error');
     } else {
-      setStaffList(data);
+      const sortedData = data.sort((a, b) => {
+        const roleOrder = ['Admin', 'Manager', 'Salesman', 'Service'];
+        return roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
+      });
+      setStaffList(sortedData);
     }
   };
 
@@ -90,7 +92,7 @@ const Organisation = () => {
     if (dialogType === 'add') {
       result = await supabase.from('users').insert([staff]);
     } else if (dialogType === 'edit') {
-      const { password, ...updatedStaff } = staff;  // Exclude password when editing
+      const { password, ...updatedStaff } = staff;
       result = await supabase
         .from('users')
         .update(updatedStaff)
@@ -99,12 +101,32 @@ const Organisation = () => {
 
     const { error } = result;
     if (error) {
-      console.error(`Error ${dialogType === 'add' ? 'adding' : 'updating'} staff:`, error);
       showSnackbar(`Error ${dialogType === 'add' ? 'adding' : 'updating'} staff: ${error.message}`, 'error');
     } else {
       await fetchStaff();
       resetStaffForm();
       showSnackbar(`Staff member ${dialogType === 'add' ? 'added' : 'updated'} successfully`, 'success');
+      handleDialogClose();
+    }
+  };
+
+  const handleEditPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedRecord) {
+      showSnackbar('No staff member selected for password edit', 'error');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('users')
+      .update({ password: staff.password })
+      .eq('id', selectedRecord.id);
+    if (error) {
+      showSnackbar(`Error updating password: ${error.message}`, 'error');
+    } else {
+      await fetchStaff();
+      resetStaffForm();
+      showSnackbar('Password updated successfully', 'success');
       handleDialogClose();
     }
   };
@@ -120,7 +142,6 @@ const Organisation = () => {
       .delete()
       .eq('id', selectedRecord.id);
     if (error) {
-      console.error('Error deleting staff:', error);
       showSnackbar(`Error deleting staff: ${error.message}`, 'error');
     } else {
       await fetchStaff();
@@ -142,10 +163,35 @@ const Organisation = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleDownload = () => {
+    const csvContent = [
+      ['Username', 'Email', 'Role', 'Mobile Number', 'Phone Number', 'Address'],
+      ...staffList.map((staff) => [
+        staff.username,
+        staff.useremail,
+        staff.role,
+        staff.mobile_number,
+        staff.phone_number,
+        staff.address,
+      ]),
+    ]
+      .map((e) => e.join(','))
+      .join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'staff_list.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredStaffList = staffList.filter(
     (staff) =>
       staff.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      staff.useremail.toLowerCase().includes(searchTerm.toLowerCase())
+      staff.useremail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      staff.mobile_number.includes(searchTerm) ||
+      staff.phone_number.includes(searchTerm)
   );
 
   const handleDialogOpen = (type) => {
@@ -200,19 +246,25 @@ const Organisation = () => {
                 onChange={handleSearch}
                 variant="outlined"
                 size="small"
-                sx={{ pl: 1, pr: 1, py: 1, borderRadius: 1 }}
+                sx={{ pl: 1, pr: 1, py: 1, borderRadius: 2 }}
+                autoComplete="off"
               />
               <Tooltip title="Add new staff">
                 <IconButton
-                  className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
+                  className="p-2"
                   onClick={() => handleDialogOpen('add')}
+                  style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}
                 >
                   <PersonAddAltIcon style={{ fontSize: '1.75rem' }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Settings">
-                <IconButton className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
-                  <SettingsIcon style={{ fontSize: '1.75rem' }} />
+              <Tooltip title="Download CSV">
+                <IconButton
+                  className="p-2"
+                  onClick={handleDownload}
+                  style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}
+                >
+                  <DownloadIcon style={{ fontSize: '1.75rem' }} />
                 </IconButton>
               </Tooltip>
             </div>
@@ -224,18 +276,17 @@ const Organisation = () => {
       <div className="flex-grow p-4 space-x-4 overflow-x-auto">
         <TableContainer component={Paper} className="shadow-md sm:rounded-lg overflow-auto">
           <Table stickyHeader className="min-w-full">
-            <TableHead>
-              <TableRow>
-                <TableCell>Actions</TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Mobile Number</TableCell>
-                <TableCell>Phone Number</TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell>Resume</TableCell>
-              </TableRow>
-            </TableHead>
+          <TableHead>
+  <TableRow>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Actions</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Username</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Email</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Role</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Mobile Number</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Phone Number</TableCell>
+    <TableCell sx={{ fontWeight: 'bold', color: 'black', maxWidth: '150px' }}>Address</TableCell>
+  </TableRow>
+</TableHead>
             <TableBody>
               {filteredStaffList.length > 0 ? (
                 filteredStaffList.map((staffMember) => (
@@ -250,19 +301,18 @@ const Organisation = () => {
                     <TableCell>{staffMember.role}</TableCell>
                     <TableCell>{staffMember.mobile_number}</TableCell>
                     <TableCell>{staffMember.phone_number}</TableCell>
-                    <TableCell>{staffMember.address}</TableCell>
                     <TableCell>
-                      {staffMember.resume_link && (
-                        <Link href={staffMember.resume_link} target="_blank" rel="noopener">
-                          View Resume
-                        </Link>
-                      )}
+                      <Tooltip title={staffMember.address}>
+                        <Typography noWrap style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {staffMember.address}
+                        </Typography>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={7} align="center">
                     No data to display
                   </TableCell>
                 </TableRow>
@@ -285,105 +335,127 @@ const Organisation = () => {
           </ListItemIcon>
           <ListItemText primary="Delete record" />
         </MenuItem>
+        <MenuItem onClick={() => handleDialogOpen('edit-password')} sx={{ padding: '12px 20px' }}>
+          <ListItemIcon>
+            <LockIcon fontSize="small" sx={{ fontSize: '20px' }} />
+          </ListItemIcon>
+          <ListItemText primary="Edit Password" />
+        </MenuItem>
       </Menu>
 
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>{dialogType === 'add' ? 'Add New Staff Member' : 'Edit Staff Member'}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Username"
-            name="username"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.username}
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Email"
-            name="useremail"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.useremail}
-            onChange={handleChange}
-            required
-          />
-          {dialogType === 'add' && (
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="dense"
-              value={staff.password}
-              onChange={handleChange}
-              required
-            />
-          )}
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Role</InputLabel>
-            <Select
-              name="role"
-              value={staff.role}
-              onChange={handleChange}
-              label="Role"
-            >
-              <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="manager">Manager</MenuItem>
-              <MenuItem value="salesman">Salesman</MenuItem>
-              <MenuItem value="service">Service</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Mobile Number"
-            name="mobile_number"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.mobile_number}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Phone Number"
-            name="phone_number"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.phone_number}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Address"
-            name="address"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            multiline
-            rows={2}
-            value={staff.address}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Resume Link"
-            name="resume_link"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            value={staff.resume_link}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} color="primary">
-            {dialogType === 'add' ? 'Add Staff' : 'Update Staff'}
-          </Button>
-        </DialogActions>
+        <DialogTitle>{dialogType === 'edit-password' ? 'Edit Password' : dialogType === 'add' ? 'Add New Staff Member' : 'Edit Staff Member'}</DialogTitle>
+        <form autoComplete="off">
+          <DialogContent>
+            {dialogType === 'edit-password' ? (
+              <TextField
+                label="New Password"
+                name="password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                value={staff.password}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+            ) : (
+              <>
+                <TextField
+                  label="Username"
+                  name="username"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  value={staff.username}
+                  onChange={handleChange}
+                  required
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Email"
+                  name="useremail"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  value={staff.useremail}
+                  onChange={handleChange}
+                  required
+                  autoComplete="new-email"
+                />
+                {dialogType === 'add' && (
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    margin="dense"
+                    value={staff.password}
+                    onChange={handleChange}
+                    required
+                    autoComplete="new-password"
+                  />
+                )}
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>Role</InputLabel>
+                  <Select
+                    name="role"
+                    value={staff.role}
+                    onChange={handleChange}
+                    label="Role"
+                  >
+                    <MenuItem value="Admin">Admin</MenuItem>
+                    <MenuItem value="Manager">Manager</MenuItem>
+                    <MenuItem value="Salesman">Salesman</MenuItem>
+                    <MenuItem value="Service">Service</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Mobile Number"
+                  name="mobile_number"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  value={staff.mobile_number}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Phone Number"
+                  name="phone_number"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  value={staff.phone_number}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Address"
+                  name="address"
+                  variant="outlined"
+                  fullWidth
+                  margin="dense"
+                  multiline
+                  rows={2}
+                  value={staff.address}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={dialogType === 'edit-password' ? handleEditPasswordSubmit : handleSubmit} color="primary">
+              {dialogType === 'edit-password' ? 'Update Password' : dialogType === 'add' ? 'Add Staff' : 'Update Staff'}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
 
       <Snackbar

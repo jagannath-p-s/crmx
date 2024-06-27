@@ -24,7 +24,6 @@ import {
 } from '@mui/icons-material';
 import { saveAs } from 'file-saver';
 import { format, parseISO, isValid } from 'date-fns';
-import './Activities.css'; // Import the CSS file
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70 },
@@ -114,14 +113,22 @@ const Activities = () => {
           sx={{ minWidth: 200 }}
         />
         <div className="flex items-center space-x-4">
-          <Tooltip title="Download">
-            <IconButton color="primary" onClick={handleDownload}>
-              <DownloadIcon />
+          <Tooltip title="Add new row">
+            <IconButton
+              className="p-2 hover:bg-blue-600 rounded-full"
+              onClick={handleAddDialogOpen}
+              sx={{ backgroundColor: 'blue.500', color: 'white', borderRadius: '12px' }}
+            >
+              <AddIcon style={{ fontSize: '1.75rem', color: 'white' }} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Add new row">
-            <IconButton color="primary" onClick={handleAddDialogOpen}>
-              <AddIcon />
+          <Tooltip title="Download">
+            <IconButton
+              className="p-2 hover:bg-blue-600 rounded-full"
+              onClick={handleDownload}
+              sx={{ backgroundColor: '#2563EB', color: 'white', borderRadius: '12px' }}
+            >
+              <DownloadIcon style={{ fontSize: '1.75rem', color: 'white' }} />
             </IconButton>
           </Tooltip>
         </div>
@@ -139,10 +146,16 @@ const Activities = () => {
           sx={{
             '& .MuiDataGrid-cell': {
               borderBottom: '1px solid #e0e0e0',
+              '&:focus, &:focus-within': {
+                outline: 'none',
+              },
             },
             '& .MuiDataGrid-columnHeaders': {
               backgroundColor: '#f5f5f5',
               borderBottom: '1px solid #e0e0e0',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
             },
             '& .MuiDataGrid-footerContainer': {
               borderTop: '1px solid #e0e0e0',
