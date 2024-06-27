@@ -1,4 +1,38 @@
-supbase url : https://tyzhqkvauoujzwxwkqsg.supabase.co
+Requirements for Contacts
+
+Pipelines and Stages:
+
+Pipelines:
+Examples: SMAM, Sale, Khseerasree, General Subsidy, Irrigation Subsidy
+
+Stages:
+Examples: Sale, Supply, Installation, Sale Completed, Feedback, Demo
+
+Admin can add new pipelines and new stages for existing pipelines
+
+Ability to add fields to pipeline stages (either files or values) which can be chosen by the admin (e.g., description, feedback, saakshi pathram (file)).
+
+
+Functionality:
+Each contact moves through stages within a selected pipeline.
+Dates are tracked FIFO (First-In-First-Out) for sale with low waiting numbers first.
+Pipeline stage transitions should dynamically update in dropdowns and are set by admin.
+
+Customer Codes and UserFlow code 
+Each customer has a unique customercode and userflow containing the user IDs of participants in the sale, separated by slashes (e.g., 1/23/45).
+When a customer inquiry moves stages, the last participating user is rewarded with a point.
+
+first salesman took the initial client call which then led to a follow up so the flow code will be 21/ where 21 is the user id of the salesman who
+took the first call , when the person who did a followup and moves the customer to biling his flowcode will be 21/40/ where 40 is the id of the person who did the follow up 
+the final stage is customer won or customer lost , if its customer won only add the the last id , because this flow code is used to claculate the points of the users
+
+Performance Tracking:
+Two tables are needed:
+One to store the total points of each user.
+Another to track points and add datetime to monitor monthly performance summaries of salesmen.,
+ ,
+ 
+The current database schema is supbase url : https://tyzhqkvauoujzwxwkqsg.supabase.co
 supabase api key : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5emhxa3ZhdW91anp3eHdrcXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgxNzE0MDksImV4cCI6MjAzMzc0NzQwOX0.-Cvcfopgseqzk2vzmhCxvppnyEhk8RDVuqfkB67ppzU
 
 create table

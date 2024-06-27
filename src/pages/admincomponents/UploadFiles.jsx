@@ -388,17 +388,17 @@ const UploadFiles = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={fileDialogOpen} onClose={handleCloseFileDialog} maxWidth="sm" fullWidth>
+      <Dialog open={fileDialogOpen} onClose={handleCloseFileDialog} maxWidth="lg" fullWidth>
         <DialogTitle>File Preview</DialogTitle>
         <DialogContent>
           {unsupportedFile ? (
-            <Typography variant="body1" >
+            <Typography variant="body1" color="error">
               Unsupported file type for preview.
             </Typography>
           ) : selectedFileUrl ? (
-            <img src={selectedFileUrl} alt="Preview" style={{ width: '50%', maxHeight: '600px', objectFit: 'contain' }} />
+            <img src={selectedFileUrl} alt="Preview" style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }} />
           ) : (
-            <Typography variant="body1" >
+            <Typography variant="body1" color="error">
               Unsupported file type for preview.
             </Typography>
           )}

@@ -1,286 +1,687 @@
-import React, { useState } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper, 
-  TextField, 
+import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
+import {
+  TextField,
   IconButton,
-  Typography,
-  FormControl,
   Tooltip,
   Menu,
   MenuItem,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
   ListItemIcon,
   ListItemText,
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogTitle, 
-  Button 
+  Snackbar,
+  Alert,
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  FormGroup,
+  Select,
+  InputLabel,
+  Box,
+  Typography,
 } from '@mui/material';
 import {
-  MoreVert as MoreVertIcon,
   Add as AddIcon,
-  CloudUpload as CloudUploadIcon,
-  Settings as SettingsIcon,
-  FileCopy as CopyIcon,
-  Download as DownloadIcon,
+  Edit as EditIcon,
   Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
+  Settings as SettingsIcon,
+  FilterList as FilterListIcon,
+  Inventory as InventoryIcon,
+  Download as DownloadIcon,
+  Category as CategoryIcon,
+  SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
+  Storage as StorageIcon,
 } from '@mui/icons-material';
 
 const Stock = () => {
-  const [stockItems, setStockItems] = useState([
-    { 
-      productName: 'Sample Product', 
-      unitPrice: 10, 
-      quantity: 50,
-      threshold: 10, 
-      overstock: 100,
-      description: 'Sample product description'
-    }
-  ]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productDialogOpen, setProductDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [subcategoryDialogOpen, setSubcategoryDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newSubcategoryName, setNewSubcategoryName] = useState('');
+  const [newSubcategoryCategoryId, setNewSubcategoryCategoryId] = useState('');
+  const [productName, setProductName] = useState('');
+  const [productCode, setProductCode] = useState('');
+  const [productCategory, setProductCategory] = useState('');
+  const [productSubcategory, setProductSubcategory] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [productMinStock, setProductMinStock] = useState('');
+  const [productMaxStock, setProductMaxStock] = useState('');
+  const [productCurrentStock, setProductCurrentStock] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newItem, setNewItem] = useState({});
+  const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+  const [filterStockLevel, setFilterStockLevel] = useState('');
+  const [visibleColumns, setVisibleColumns] = useState({
+    currentStock: true,
+    productCode: true,
+    productName: true,
+    category: true,
+    subcategory: true,
+    price: true,
+    minStock: true,
+    maxStock: true,
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [productToDelete, setProductToDelete] = useState(null);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+    fetchSubcategories();
+  }, []);
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) {
+      showSnackbar(`Error fetching products: ${error.message}`, 'error');
+    } else {
+      setProducts(data);
+    }
   };
 
-  const handleMenuOpen = (event, item) => {
+  const fetchCategories = async () => {
+    const { data, error } = await supabase.from('categories').select('*');
+    if (error) {
+      showSnackbar(`Error fetching categories: ${error.message}`, 'error');
+    } else {
+      setCategories(data);
+    }
+  };
+
+  const fetchSubcategories = async () => {
+    const { data, error } = await supabase.from('subcategories').select('*');
+    if (error) {
+      showSnackbar(`Error fetching subcategories: ${error.message}`, 'error');
+    } else {
+      setSubcategories(data);
+    }
+  };
+
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    setSelectedItem(item);
+  };
+
+  const handleSettingsMenuOpen = (event) => {
+    setSettingsAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterMenuOpen = (event) => {
+    setFilterAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedItem(null);
+    setSettingsAnchorEl(null);
+    setFilterAnchorEl(null);
   };
 
-  const handleCopyURL = () => {
-    console.log('Copy URL:', selectedItem);
+  const handleOpenProductDialog = () => {
+    setSelectedProduct(null);
+    setProductCode('');
+    setProductName('');
+    setProductCategory('');
+    setProductSubcategory('');
+    setProductPrice('');
+    setProductMinStock('');
+    setProductMaxStock('');
+    setProductCurrentStock('');
+    setProductDialogOpen(true);
     handleMenuClose();
   };
 
-  const handleDownload = () => {
-    console.log('Download:', selectedItem);
+  const handleOpenCategoryDialog = () => {
+    setNewCategoryName('');
+    setCategoryDialogOpen(true);
     handleMenuClose();
   };
 
-  const handleDelete = () => {
-    setStockItems(stockItems.filter(item => item !== selectedItem));
+  const handleOpenSubcategoryDialog = () => {
+    setNewSubcategoryName('');
+    setNewSubcategoryCategoryId('');
+    setSubcategoryDialogOpen(true);
     handleMenuClose();
   };
 
-  const handleAddDialogOpen = () => {
-    setAddDialogOpen(true);
+  const handleCloseProductDialog = () => {
+    setProductDialogOpen(false);
   };
 
-  const handleAddDialogClose = () => {
-    setAddDialogOpen(false);
-    setNewItem({});
+  const handleCloseCategoryDialog = () => {
+    setCategoryDialogOpen(false);
   };
 
-  const handleNewItemChange = (event) => {
-    setNewItem({ ...newItem, [event.target.name]: event.target.value });
+  const handleCloseSubcategoryDialog = () => {
+    setSubcategoryDialogOpen(false);
   };
 
-  const handleAddItem = () => {
-    setStockItems([...stockItems, newItem]);
-    handleAddDialogClose();
+  const handleAddCategory = async () => {
+    const { error } = await supabase.from('categories').insert([{ category_name: newCategoryName }]);
+    if (error) {
+      showSnackbar(`Error adding category: ${error.message}`, 'error');
+    } else {
+      showSnackbar('Category added successfully', 'success');
+      fetchCategories();
+      handleCloseCategoryDialog();
+    }
   };
 
-  const filteredStockItems = stockItems.filter(item =>
-    item.productName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleAddSubcategory = async () => {
+    const { error } = await supabase
+      .from('subcategories')
+      .insert([{ subcategory_name: newSubcategoryName, category_id: newSubcategoryCategoryId }]);
+    if (error) {
+      showSnackbar(`Error adding subcategory: ${error.message}`, 'error');
+    } else {
+      showSnackbar('Subcategory added successfully', 'success');
+      fetchSubcategories();
+      handleCloseSubcategoryDialog();
+    }
+  };
+
+  const handleSaveProduct = async () => {
+    const productData = {
+      product_code: productCode,
+      product_name: productName,
+      category_id: productCategory,
+      subcategory_id: productSubcategory,
+      price: parseFloat(productPrice),
+      min_stock: parseInt(productMinStock),
+      max_stock: parseInt(productMaxStock),
+      current_stock: parseInt(productCurrentStock),
+    };
+
+    if (selectedProduct) {
+      const { error } = await supabase
+        .from('products')
+        .update(productData)
+        .eq('product_id', selectedProduct.product_id);
+      if (error) {
+        showSnackbar(`Error updating product: ${error.message}`, 'error');
+      } else {
+        showSnackbar('Product updated successfully', 'success');
+        fetchProducts();
+        handleCloseProductDialog();
+      }
+    } else {
+      const { error } = await supabase
+        .from('products')
+        .insert([productData]);
+      if (error) {
+        showSnackbar(`Error adding product: ${error.message}`, 'error');
+      } else {
+        showSnackbar('Product added successfully', 'success');
+        fetchProducts();
+        handleCloseProductDialog();
+      }
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setProductCode(product.product_code);
+    setProductName(product.product_name);
+    setProductCategory(product.category_id);
+    setProductSubcategory(product.subcategory_id);
+    setProductPrice(product.price.toString());
+    setProductMinStock(product.min_stock.toString());
+    setProductMaxStock(product.max_stock.toString());
+    setProductCurrentStock(product.current_stock.toString());
+    setProductDialogOpen(true);
+  };
+
+  const handleDeleteProduct = (product_id) => {
+    setProductToDelete(product_id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteProduct = async () => {
+    const { error } = await supabase.from('products').delete().eq('product_id', productToDelete);
+    if (error) {
+      showSnackbar(`Error deleting product: ${error.message}`, 'error');
+    } else {
+      showSnackbar('Product deleted successfully', 'success');
+      fetchProducts();
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
+    }
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setProductToDelete(null);
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const getCurrentStockColor = (current, min, max) => {
+    if (current <= min) return 'red';
+    if (current > min && current <= max * 0.5) return 'darkorange';
+    if (current > max * 0.5 && current < max) return 'yellowgreen';
+    if (current >= max) return 'green';
+    return 'gray';
+  };
+
+
+
+  const handleVisibleColumnChange = (event) => {
+    setVisibleColumns({ ...visibleColumns, [event.target.name]: event.target.checked });
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+  
+  const handleFilterChange = (event) => {
+    setFilterStockLevel(event.target.value);
+  };
+
+  const handleDownloadProductData = () => {
+    const data = products.map(product => ({
+      'Product Code': product.product_code,
+      'Product Name': product.product_name,
+      'Category': categories.find(cat => cat.category_id === product.category_id)?.category_name,
+      'Subcategory': subcategories.find(sub => sub.subcategory_id === product.subcategory_id)?.subcategory_name,
+      'Price': product.price,
+      'Min Stock': product.min_stock,
+      'Max Stock': product.max_stock,
+      'Current Stock': product.current_stock,
+    }));
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+  
+const filteredProducts = products.filter((product) => {
+  const matchesSearchTerm =
+    product.product_code.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    categories.find((cat) => cat.category_id === product.category_id)?.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    subcategories.find((sub) => sub.subcategory_id === product.subcategory_id)?.subcategory_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.price.toString().includes(searchTerm.toLowerCase()) ||
+    product.min_stock.toString().includes(searchTerm.toLowerCase()) ||
+    product.max_stock.toString().includes(searchTerm.toLowerCase()) ||
+    product.current_stock.toString().includes(searchTerm.toLowerCase());
+
+  if (filterStockLevel) {
+    const color = getCurrentStockColor(product.current_stock, product.min_stock, product.max_stock);
+    return matchesSearchTerm && color === filterStockLevel;
+  }
+  return matchesSearchTerm;
+});
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow-md border-t-2 border-blue-500 border-b border-gray-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-3">
+    {/* Header */}
+    <div className="bg-white shadow-md border-b border-t border-gray-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-3">
+          <div className="flex items-center space-x-4">
+            <StorageIcon className="text-blue-500" style={{ fontSize: '1.75rem' }} />
+            <h1 className="text-xl font-semibold ml-2">Stock</h1>
+          </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <CloudUploadIcon className="text-blue-500" style={{ fontSize: '1.75rem' }} />
-                <h1 className="text-xl font-semibold ml-2">Stock Management</h1>
-              </div>
-              <div className="relative">
-                <TextField
-                  type="text"
-                  placeholder="Search for products"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  variant="outlined"
-                  size="small"
-                  sx={{ pl: 10, pr: 4, py: 2, borderRadius: 1 }}
-                />
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Tooltip title="Settings">
-                <IconButton className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
-                  <SettingsIcon style={{ fontSize: '1.75rem' }} />
-                </IconButton>
-              </Tooltip>
+              <TextField
+                variant="outlined"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                size="small"
+              />
               <Tooltip title="Download">
-                <IconButton className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                <IconButton
+                  onClick={handleDownloadProductData}
+                  style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}
+                >
                   <DownloadIcon style={{ fontSize: '1.75rem' }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Add new item">
-                <IconButton className="p-2 text-gray-500 hover:bg-gray-100 rounded-full" onClick={handleAddDialogOpen}>
+              <Tooltip title="Add">
+                <IconButton onClick={handleMenuOpen} style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}>
                   <AddIcon style={{ fontSize: '1.75rem' }} />
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Filter">
+                <IconButton onClick={handleFilterMenuOpen} style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}>
+                  <FilterListIcon style={{ fontSize: '1.75rem' }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Settings">
+                <IconButton onClick={handleSettingsMenuOpen} style={{ backgroundColor: '#e3f2fd', color: '#1e88e5', borderRadius: '12px' }}>
+                  <SettingsIcon style={{ fontSize: '1.75rem' }} />
+                </IconButton>
+              </Tooltip>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+  <MenuItem onClick={handleOpenProductDialog} sx={{ padding: '12px 24px' }}>
+    <ListItemIcon>
+      <AddIcon fontSize="medium" />
+    </ListItemIcon>
+    <ListItemText primary="Add Product" />
+  </MenuItem>
+  <MenuItem onClick={handleOpenCategoryDialog} sx={{ padding: '12px 24px' }}>
+    <ListItemIcon>
+      <CategoryIcon fontSize="medium" />
+    </ListItemIcon>
+    <ListItemText primary="Add Category" />
+  </MenuItem>
+  <MenuItem onClick={handleOpenSubcategoryDialog} sx={{ padding: '12px 24px' }}>
+    <ListItemIcon>
+      <SubdirectoryArrowRightIcon fontSize="medium" />
+    </ListItemIcon>
+    <ListItemText primary="Add Subcategory" />
+  </MenuItem>
+</Menu>
+
+
+              <Menu anchorEl={filterAnchorEl} open={Boolean(filterAnchorEl)} onClose={handleMenuClose}>
+                <MenuItem onClick={() => { handleFilterChange({ target: { value: '' } }); handleMenuClose(); }}>
+                  All
+                </MenuItem>
+                <MenuItem onClick={() => { handleFilterChange({ target: { value: 'red' } }); handleMenuClose(); }}>
+                  Low Stock
+                </MenuItem>
+                <MenuItem onClick={() => { handleFilterChange({ target: { value: 'darkorange' } }); handleMenuClose(); }}>
+                  Medium-Low Stock
+                </MenuItem>
+                <MenuItem onClick={() => { handleFilterChange({ target: { value: 'yellowgreen' } }); handleMenuClose(); }}>
+                  Medium-High Stock
+                </MenuItem>
+                <MenuItem onClick={() => { handleFilterChange({ target: { value: 'green' } }); handleMenuClose(); }}>
+                  High Stock
+                </MenuItem>
+              </Menu>
+              <Menu anchorEl={settingsAnchorEl} open={Boolean(settingsAnchorEl)} onClose={handleMenuClose}>
+                <Box sx={{ p: 2 }}>
+                  <FormControl component="fieldset" variant="standard">
+                    {Object.entries(visibleColumns).map(([key, value]) => (
+                      <FormControlLabel
+                        key={key}
+                        control={
+                          <Checkbox
+                            checked={value}
+                            onChange={handleVisibleColumnChange}
+                            name={key}
+                          />
+                        }
+                        label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim()}
+                      />
+                    ))}
+                  </FormControl>
+                </Box>
+              </Menu>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-grow p-4 space-x-4 overflow-auto">
+      <div className="flex-grow p-4 space-x-4 overflow-x-auto">
         <TableContainer component={Paper} className="shadow-md sm:rounded-lg overflow-auto">
           <Table stickyHeader className="min-w-full">
             <TableHead>
               <TableRow>
-                <TableCell>Actions</TableCell>
-                <TableCell>Product Name</TableCell>
-                <TableCell>Unit Price</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Threshold</TableCell>
-                <TableCell>Overstock</TableCell>
-                <TableCell>Description</TableCell>
+                {Object.entries(visibleColumns).map(([key, value]) =>
+                  value && <TableCell key={key} sx={{ fontWeight: 'bold', color: 'black' }}>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim()}</TableCell>
+                )}
+                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredStockItems.length > 0 ? (
-                filteredStockItems.map((item, index) => (
-                  <TableRow key={index} className="bg-white border-b">
-                    <TableCell>
-                      <IconButton onClick={(event) => handleMenuOpen(event, item)}>
-                        <MoreVertIcon />
-                      </IconButton>
+              {filteredProducts.map((product) => (
+                <TableRow key={product.product_id} className="bg-white border-b">
+                  {visibleColumns.currentStock && (
+                    <TableCell sx={{ fontWeight: 'bold', color: getCurrentStockColor(product.current_stock, product.min_stock, product.max_stock) }}>
+                      {product.current_stock}
                     </TableCell>
-                    <TableCell>{item.productName}</TableCell>
-                    <TableCell>{item.unitPrice}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>{item.threshold}</TableCell>
-                    <TableCell>{item.overstock}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">No data to display</TableCell>
+                  )}
+                  {visibleColumns.productCode && <TableCell>{product.product_code}</TableCell>}
+                  {visibleColumns.productName && <TableCell>{product.product_name}</TableCell>}
+                  {visibleColumns.category && <TableCell>{categories.find((cat) => cat.category_id === product.category_id)?.category_name}</TableCell>}
+                  {visibleColumns.subcategory && <TableCell>{subcategories.find((sub) => sub.subcategory_id === product.subcategory_id)?.subcategory_name}</TableCell>}
+                  {visibleColumns.price && <TableCell>{product.price}</TableCell>}
+                  {visibleColumns.minStock && <TableCell>{product.min_stock}</TableCell>}
+                  {visibleColumns.maxStock && <TableCell>{product.max_stock}</TableCell>}
+                  <TableCell>
+                    <Tooltip title="Edit product">
+                      <IconButton onClick={() => handleEditProduct(product)}>
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete product">
+                      <IconButton onClick={() => handleDeleteProduct(product.product_id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
-              )}
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
+      </div>
 
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-          <MenuItem onClick={handleCopyURL} sx={{ padding: '12px 20px' }}>
-            <ListItemIcon sx={{ minWidth: '40px' }}>
-              <CopyIcon fontSize="small" sx={{ fontSize: '20px' }} />
-            </ListItemIcon>
-            <ListItemText primary="Copy URL" />
-          </MenuItem>
-          <MenuItem onClick={handleDownload} sx={{ padding: '12px 20px' }}>
-            <ListItemIcon sx={{ minWidth: '40px' }}>
-              <DownloadIcon fontSize="small" sx={{ fontSize: '20px' }} />
-            </ListItemIcon>
-            <ListItemText primary="Download file" />
-          </MenuItem>
-          <MenuItem onClick={handleDelete} sx={{ padding: '12px 20px' }}>
-            <ListItemIcon sx={{ minWidth: '40px' }}>
-              <DeleteIcon fontSize="small" sx={{ fontSize: '20px' }} />
-            </ListItemIcon>
-            <ListItemText primary="Delete file" />
-          </MenuItem>
-        </Menu>
-
-        {/* Add Item Dialog */}
-        <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-          <DialogTitle>Add New Item</DialogTitle>
-          <DialogContent>
+      <Dialog open={productDialogOpen} onClose={handleCloseProductDialog} fullWidth maxWidth="sm">
+        <DialogTitle>{selectedProduct ? 'Edit Product' : 'Add Product'}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              label="Product Code"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              value={productCode}
+              onChange={(e) => setProductCode(e.target.value)}
+            />
             <TextField
               label="Product Name"
-              name="productName"
               variant="outlined"
               fullWidth
               margin="dense"
-              value={newItem.productName || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={productCategory}
+                onChange={(e) => setProductCategory(e.target.value)}
+                label="Category"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.category_id} value={category.category_id}>
+                    {category.category_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Subcategory</InputLabel>
+              <Select
+                value={productSubcategory}
+                onChange={(e) => setProductSubcategory(e.target.value)}
+                label="Subcategory"
+              >
+                {subcategories
+                  .filter((sub) => sub.category_id === productCategory)
+                  .map((subcategory) => (
+                    <MenuItem key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                      {subcategory.subcategory_name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Price"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              type="number"
+              value={productPrice}
+              onChange={(e) => setProductPrice(e.target.value)}
             />
             <TextField
-              label="Unit Price"
-              name="unitPrice"
+              label="Min Stock"
               variant="outlined"
               fullWidth
               margin="dense"
-              value={newItem.unitPrice || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
+              type="number"
+              value={productMinStock}
+              onChange={(e) => setProductMinStock(e.target.value)}
+            />
+                        <TextField
+              label="Max Stock"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              type="number"
+              value={productMaxStock}
+              onChange={(e) => setProductMaxStock(e.target.value)}
             />
             <TextField
-              label="Quantity"
-              name="quantity"
+              label="Current Stock"
               variant="outlined"
               fullWidth
               margin="dense"
-              value={newItem.quantity || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
+              type="number"
+              value={productCurrentStock}
+              onChange={(e) => setProductCurrentStock(e.target.value)}
             />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseProductDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSaveProduct} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={categoryDialogOpen} onClose={handleCloseCategoryDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Add Category</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
             <TextField
-              label="Threshold"
-              name="threshold"
+              label="Category Name"
               variant="outlined"
               fullWidth
               margin="dense"
-              value={newItem.threshold || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
             />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCategoryDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddCategory} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={subcategoryDialogOpen} onClose={handleCloseSubcategoryDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Add Subcategory</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
             <TextField
-              label="Overstock"
-              name="overstock"
+              label="Subcategory Name"
               variant="outlined"
               fullWidth
               margin="dense"
-              value={newItem.overstock || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
+              value={newSubcategoryName}
+              onChange={(e) => setNewSubcategoryName(e.target.value)}
             />
-            <TextField
-              label="Description"
-              name="description"
-              variant="outlined"
-              fullWidth
-              margin="dense"
-              value={newItem.description || ''}
-              onChange={handleNewItemChange}
-              className="mt-2 mb-4"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleAddDialogClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleAddItem} color="primary">
-              Add Item
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={newSubcategoryCategoryId}
+                onChange={(e) => setNewSubcategoryCategoryId(e.target.value)}
+                label="Category"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.category_id} value={category.category_id}>
+                    {category.category_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSubcategoryDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddSubcategory} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography>Are you sure you want to delete this product?</Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteProduct} color="primary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

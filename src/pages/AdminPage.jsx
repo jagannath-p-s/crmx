@@ -174,11 +174,12 @@ const AdminPage = () => {
                   </button>
                 </Tooltip>
                 <button
-                  className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white"
-                  onClick={handleMenuOpen}
-                >
-                  J
-                </button>
+  className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white text-lg font-bold uppercase"
+  onClick={handleMenuOpen}
+>
+  {user.username[0].toUpperCase()}
+</button>
+
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
