@@ -1,0 +1,99 @@
+Here is the SQL code to create the necessary tables and views for the new requirements:
+
+### SQL to Create Tables and Views
+
+```sql
+-- Contacts Table
+CREATE TABLE public.contacts (
+    contact_id serial PRIMARY KEY,
+    customer_code character varying(50) NOT NULL,
+    contact_name character varying(255) NOT NULL,
+    contact_email character varying(255) NOT NULL,
+    contact_phone character varying(50) NOT NULL
+) TABLESPACE pg_default;
+
+-- Pipelines Table
+CREATE TABLE public.pipelines (
+    pipeline_id serial PRIMARY KEY,
+    pipeline_name character varying(255) NOT NULL
+) TABLESPACE pg_default;
+
+-- Stages Table
+CREATE TABLE public.stages (
+    stage_id serial PRIMARY KEY,
+    pipeline_id integer NOT NULL,
+    stage_name character varying(255) NOT NULL,
+    FOREIGN KEY (pipeline_id) REFERENCES pipelines (pipeline_id)
+) TABLESPACE pg_default;
+
+-- Contact_Stages Table
+CREATE TABLE public.contact_stages (
+    contact_stage_id serial PRIMARY KEY,
+    contact_id integer NOT NULL,
+    stage_id integer NOT NULL,
+    date_moved timestamp without time zone DEFAULT current_timestamp,
+    FOREIGN KEY (contact_id) REFERENCES contacts (contact_id),
+    FOREIGN KEY (stage_id) REFERENCES stages (stage_id)
+) TABLESPACE pg_default;
+
+-- Dynamic_Fields Table
+CREATE TABLE public.dynamic_fields (
+    field_id serial PRIMARY KEY,
+    field_name character varying(255) NOT NULL,
+    field_type character varying(50) NOT NULL CHECK (field_type IN ('value', 'file'))
+) TABLESPACE pg_default;
+
+-- Dynamic_Field_Values Table
+CREATE TABLE public.dynamic_field_values (
+    field_value_id serial PRIMARY KEY,
+    contact_id integer NOT NULL,
+    field_id integer NOT NULL,
+    field_value text,
+    field_file_path character varying(255),
+    FOREIGN KEY (contact_id) REFERENCES contacts (contact_id),
+    FOREIGN KEY (field_id) REFERENCES dynamic_fields (field_id)
+) TABLESPACE pg_default;
+
+-- User_Points Table
+CREATE TABLE public.user_points (
+    user_id integer PRIMARY KEY,
+    total_points integer DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+) TABLESPACE pg_default;
+
+-- Points_History Table
+CREATE TABLE public.points_history (
+    points_history_id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    points_awarded integer NOT NULL,
+    date_awarded timestamp without time zone DEFAULT current_timestamp,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+) TABLESPACE pg_default;
+
+-- Create a view for better insights on contact stages
+CREATE VIEW public.contact_stages_view AS
+SELECT
+    cs.contact_stage_id,
+    c.contact_name,
+    c.customer_code,
+    p.pipeline_name,
+    s.stage_name,
+    cs.date_moved
+FROM
+    contact_stages cs
+    JOIN contacts c ON cs.contact_id = c.contact_id
+    JOIN stages s ON cs.stage_id = s.stage_id
+    JOIN pipelines p ON s.pipeline_id = p.pipeline_id;
+```
+
+### Explanation:
+
+1. **Contacts Table**: Stores contact details with a unique customer code.
+2. **Pipelines Table**: Lists all possible pipelines (e.g., SMAM, sale, etc.).
+3. **Stages Table**: Lists all stages for each pipeline.
+4. **Contact_Stages Table**: Tracks the dates when a contact moves from one stage to another in a pipeline.
+5. **Dynamic_Fields Table**: Allows admins to add custom fields which can be either text values or files.
+6. **Dynamic_Field_Values Table**: Stores the values of the dynamic fields for each contact.
+7. **User_Points Table**: Tracks the total points for each user.
+8. **Points_History Table**: Records the history of points awarded to users.
+9. **Contact_Stages_View**: A view to provide better insights into contact stages, joining contacts, stages, and pipelines.

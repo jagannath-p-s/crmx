@@ -59,6 +59,9 @@ const Organisation = () => {
   const [dialogType, setDialogType] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  const [addressDialogOpen, setAddressDialogOpen] = useState(false);
+  const [addressToShow, setAddressToShow] = useState('');
+
   useEffect(() => {
     fetchStaff();
   }, []);
@@ -211,6 +214,15 @@ const Organisation = () => {
     setSelectedRecord(null);
   };
 
+  const handleAddressDialogOpen = (address) => {
+    setAddressToShow(address);
+    setAddressDialogOpen(true);
+  };
+
+  const handleAddressDialogClose = () => {
+    setAddressDialogOpen(false);
+  };
+
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
   };
@@ -302,11 +314,13 @@ const Organisation = () => {
                     <TableCell>{staffMember.mobile_number}</TableCell>
                     <TableCell>{staffMember.phone_number}</TableCell>
                     <TableCell>
-                      <Tooltip title={staffMember.address}>
-                        <Typography noWrap style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {staffMember.address}
-                        </Typography>
-                      </Tooltip>
+                      <Typography
+                        noWrap
+                        style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer' }}
+                        onClick={() => handleAddressDialogOpen(staffMember.address)}
+                      >
+                        {staffMember.address}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ))
@@ -456,6 +470,18 @@ const Organisation = () => {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+
+      <Dialog open={addressDialogOpen} onClose={handleAddressDialogClose}>
+        <DialogTitle>Address</DialogTitle>
+        <DialogContent>
+          <Typography>{addressToShow}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddressDialogClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Snackbar

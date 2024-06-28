@@ -190,24 +190,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Comments on tables and their purposes
-
-COMMENT ON TABLE public.categories IS 'Stores product categories';
-COMMENT ON TABLE public.subcategories IS 'Stores product subcategories, linked to categories';
-COMMENT ON TABLE public.products IS 'Stores product information';
-COMMENT ON TABLE public.users IS 'Stores user information and credentials';
-COMMENT ON TABLE public.uploaded_files IS 'Stores information about uploaded files';
-COMMENT ON TABLE public.pipelines IS 'Stores different sales pipelines';
-COMMENT ON TABLE public.stages IS 'Stores stages for each pipeline';
-COMMENT ON TABLE public.stage_fields IS 'Stores custom fields for each stage';
-COMMENT ON TABLE public.contacts IS 'Stores contact information and their current stage in a pipeline';
-COMMENT ON TABLE public.contact_products IS 'Links contacts with the products they are interested in';
-COMMENT ON TABLE public.contact_stage_history IS 'Tracks the history of stage transitions for each contact';
-COMMENT ON TABLE public.user_flow IS 'Stores the user flow codes for each contact';
-COMMENT ON TABLE public.user_points IS 'Tracks points earned by users';
-
-COMMENT ON VIEW public.products_view IS 'Provides a detailed view of products with category and subcategory names';
-COMMENT ON VIEW public.uploaded_files_view IS 'Provides a detailed view of uploaded files with uploader information';
-COMMENT ON VIEW public.user_total_points IS 'Calculates the total points for each user';
-
-COMMENT ON FUNCTION get_monthly_performance IS 'Calculates monthly performance for users within a given date range';

@@ -55,6 +55,10 @@ const AdminPage = () => {
     }
   };
 
+  const handleSearchClick = () => {
+    setActiveComponent('Contacts');
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -152,9 +156,9 @@ const AdminPage = () => {
                     <MenuIcon />
                   </button>
                 </Tooltip>
-                <div className="relative">
-                  <input type="text" placeholder="Search" className="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                  <SearchIcon className="absolute left-3 top-2.5 text-gray-400" />
+                <div  onClick={handleSearchClick} className="relative">
+                  <input type="text" placeholder="Search"  className="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <SearchIcon className="absolute left-3 top-2.5 text-gray-400 cursor-pointer" />
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -174,11 +178,11 @@ const AdminPage = () => {
                   </button>
                 </Tooltip>
                 <button
-  className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white text-lg font-bold uppercase"
-  onClick={handleMenuOpen}
->
-  {user.username[0].toUpperCase()}
-</button>
+                  className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white text-lg font-bold uppercase"
+                  onClick={handleMenuOpen}
+                >
+                  {user.username[0].toUpperCase()}
+                </button>
 
                 <Menu
                   anchorEl={anchorEl}
