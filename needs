@@ -99,6 +99,100 @@ from
 
   is the current database info ,
 
+  -- Table: public.sales_stages
+CREATE TABLE public.sales_stages (
+    stage_id SERIAL PRIMARY KEY,
+    stage_name VARCHAR(255) NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.pipelines
+CREATE TABLE public.pipelines (
+    pipeline_id SERIAL PRIMARY KEY,
+    pipeline_name VARCHAR(255) NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.pipeline_stages
+CREATE TABLE public.pipeline_stages (
+    stage_id SERIAL PRIMARY KEY,
+    pipeline_id INTEGER NOT NULL REFERENCES pipelines(pipeline_id),
+    stage_name VARCHAR(255) NOT NULL,
+    stage_order INTEGER NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.sales
+CREATE TABLE public.sales (
+    sale_id SERIAL PRIMARY KEY,
+    sale_name VARCHAR(255) NOT NULL,
+    pipeline_id INTEGER NOT NULL REFERENCES pipelines(pipeline_id),
+    current_stage_id INTEGER NOT NULL REFERENCES pipeline_stages(stage_id),
+    current_user_id INTEGER NOT NULL REFERENCES users(id),
+    salesflowcode VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) TABLESPACE pg_default;
+
+-- Table: public.sales_fields
+CREATE TABLE public.sales_fields (
+    field_id SERIAL PRIMARY KEY,
+    stage_id INTEGER NOT NULL REFERENCES pipeline_stages(stage_id),
+    field_name VARCHAR(255) NOT NULL,
+    is_file BOOLEAN DEFAULT FALSE
+) TABLESPACE pg_default;
+
+-- Table: public.sales_data
+CREATE TABLE public.sales_data (
+    data_id SERIAL PRIMARY KEY,
+    sale_id INTEGER NOT NULL REFERENCES sales(sale_id),
+    field_id INTEGER NOT NULL REFERENCES sales_fields(field_id),
+    field_value TEXT
+) TABLESPACE pg_default;
+-- Table: public.sales_stages
+CREATE TABLE public.sales_stages (
+    stage_id SERIAL PRIMARY KEY,
+    stage_name VARCHAR(255) NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.pipelines
+CREATE TABLE public.pipelines (
+    pipeline_id SERIAL PRIMARY KEY,
+    pipeline_name VARCHAR(255) NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.pipeline_stages
+CREATE TABLE public.pipeline_stages (
+    stage_id SERIAL PRIMARY KEY,
+    pipeline_id INTEGER NOT NULL REFERENCES pipelines(pipeline_id),
+    stage_name VARCHAR(255) NOT NULL,
+    stage_order INTEGER NOT NULL
+) TABLESPACE pg_default;
+
+-- Table: public.sales
+CREATE TABLE public.sales (
+    sale_id SERIAL PRIMARY KEY,
+    sale_name VARCHAR(255) NOT NULL,
+    pipeline_id INTEGER NOT NULL REFERENCES pipelines(pipeline_id),
+    current_stage_id INTEGER NOT NULL REFERENCES pipeline_stages(stage_id),
+    current_user_id INTEGER NOT NULL REFERENCES users(id),
+    salesflowcode VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) TABLESPACE pg_default;
+
+-- Table: public.sales_fields
+CREATE TABLE public.sales_fields (
+    field_id SERIAL PRIMARY KEY,
+    stage_id INTEGER NOT NULL REFERENCES pipeline_stages(stage_id),
+    field_name VARCHAR(255) NOT NULL,
+    is_file BOOLEAN DEFAULT FALSE
+) TABLESPACE pg_default;
+
+-- Table: public.sales_data
+CREATE TABLE public.sales_data (
+    data_id SERIAL PRIMARY KEY,
+    sale_id INTEGER NOT NULL REFERENCES sales(sale_id),
+    field_id INTEGER NOT NULL REFERENCES sales_fields(field_id),
+    field_value TEXT
+) TABLESPACE pg_default;
+
+
   now we have to add contacts 
 
   pipelines are like - SMAM , sale , khseerasree , general subsidy , irrigation subsidy 

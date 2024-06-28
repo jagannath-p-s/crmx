@@ -1,0 +1,23 @@
+There is some interlinked stuff 
+
+Like there are 5 stages of sale , lead , prospect , oppurtunity , customerwon , customer lost
+
+Then there are diffrent pipelines and its stages created by the admin,
+also  for different stages of a pipeline there are variable number of fields , 
+which are editable and added by the admin , the field may also be a file , 
+if is a file it will be uploaded to supbase bucket then its link will be written to the table 
+
+Each sale is assigned to a users , 
+when a sales is first added by a user userid 1 and assigned as a task to the next user userid2 ,
+his id is writtem to salesflowcode , then the salesflow code will be 1/ 
+also store the currently handled by userid so that when it passes to the next user ,
+his id can be written to the salesflowcode , 
+
+
+the customer details to store are there is some interlinked stuff , like there are 5 stages of sale , lead , prospect , oppurtunity , customerwon , customer lost , 
+
+
+
+
+
+
