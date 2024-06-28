@@ -37,6 +37,7 @@ import {
   Image as ImageIcon,
   PictureAsPdf as PdfIcon,
   Description as FileIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../AuthContext';
 
@@ -58,6 +59,8 @@ const UploadFiles = () => {
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const [selectedFileUrl, setSelectedFileUrl] = useState('');
   const [unsupportedFile, setUnsupportedFile] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
 
   useEffect(() => {
     fetchFiles();
@@ -224,6 +227,32 @@ const UploadFiles = () => {
     setSelectedFileUrl('');
   };
 
+  const handleEdit = () => {
+    setNewFileName(selectedFile.file_name);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditFileNameChange = (event) => {
+    setNewFileName(event.target.value);
+  };
+
+  const handleSaveEdit = async () => {
+    const { error } = await supabase
+      .from('uploaded_files')
+      .update({ file_name: newFileName })
+      .eq('file_id', selectedFile.file_id);
+
+    if (error) {
+      showSnackbar(`Error updating file name: ${error.message}`, 'error');
+    } else {
+      showSnackbar('File name updated successfully', 'success');
+      fetchFiles();
+    }
+
+    setEditDialogOpen(false);
+    handleMenuClose();
+  };
+
   const getFileIcon = (filePath) => {
     const extension = filePath.split('.').pop().toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
@@ -325,6 +354,12 @@ const UploadFiles = () => {
           </ListItemIcon>
           <ListItemText primary="Delete file" />
         </MenuItem>
+        <MenuItem onClick={handleEdit} sx={{ padding: '12px 20px' }}>
+          <ListItemIcon>
+            <EditIcon fontSize="small" sx={{ fontSize: '20px' }} />
+          </ListItemIcon>
+          <ListItemText primary="Edit file name" />
+        </MenuItem>
       </Menu>
 
       <Dialog open={uploadDialogOpen} onClose={handleCloseUploadDialog}>
@@ -388,24 +423,47 @@ const UploadFiles = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={fileDialogOpen} onClose={handleCloseFileDialog} maxWidth="lg" fullWidth>
+      <Dialog open={fileDialogOpen} onClose={handleCloseFileDialog} maxWidth="sm" fullWidth>
         <DialogTitle>File Preview</DialogTitle>
         <DialogContent>
           {unsupportedFile ? (
-            <Typography variant="body1" color="error">
-              Unsupported file type for preview.
+            <Typography variant="body1" >
+             Unsupported File type for preview. Download it to view
             </Typography>
           ) : selectedFileUrl ? (
             <img src={selectedFileUrl} alt="Preview" style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }} />
           ) : (
-            <Typography variant="body1" color="error">
-              Unsupported file type for preview.
-            </Typography>
+            <Typography variant="body1" >
+              Unsupported File type for preview. Download it to view
+         </Typography>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseFileDialog} color="primary">
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit File Name</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="New File Name"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={newFileName}
+            onChange={handleEditFileNameChange}
+            className="mt-2 mb-4"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSaveEdit} color="primary">
+            Save
           </Button>
         </DialogActions>
       </Dialog>
