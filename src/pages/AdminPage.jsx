@@ -18,7 +18,6 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import BuildIcon from '@mui/icons-material/Build';
 import StorageIcon from '@mui/icons-material/Storage';
 import BusinessIcon from '@mui/icons-material/Business';
-
 import Contacts from './admincomponents/Contacts';
 import Sales from './admincomponents/Sales';
 import Activities from './admincomponents/Activities';

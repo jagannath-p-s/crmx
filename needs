@@ -192,6 +192,20 @@ CREATE TABLE public.sales_data (
     field_value TEXT
 ) TABLESPACE pg_default;
 
+-- Table: public.tasks
+CREATE TABLE public.tasks (
+    task_id SERIAL PRIMARY KEY,
+    sale_id INTEGER NOT NULL REFERENCES sales(sale_id),
+    assigned_to_user_id INTEGER NOT NULL REFERENCES users(id),
+    assigned_by_user_id INTEGER NOT NULL REFERENCES users(id),
+    stage_id INTEGER NOT NULL REFERENCES pipeline_stages(stage_id),
+    due_date TIMESTAMP WITHOUT TIME ZONE,
+    completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) TABLESPACE pg_default;
+
+
 
   now we have to add contacts 
 
