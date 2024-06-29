@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import AddIcon from '@mui/icons-material/Add';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import EqualizerIcon from '@mui/icons-material/Equalizer';
-import Tooltip from '@mui/material/Tooltip';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import BuildIcon from '@mui/icons-material/Build';
-import StorageIcon from '@mui/icons-material/Storage';
-import BusinessIcon from '@mui/icons-material/Business';
+import {
+  Menu as MenuIcon,
+  Search as SearchIcon,
+  ForumOutlined as ForumOutlinedIcon,
+  NotificationsNone as NotificationsNoneIcon,
+  Add as AddIcon,
+  PeopleOutline as PeopleOutlineIcon,
+  CloudUploadOutlined as CloudUploadOutlinedIcon,
+  EventNote as EventNoteIcon,
+  Equalizer as EqualizerIcon,
+  SettingsOutlined as SettingsOutlinedIcon,
+  ExitToApp as ExitToAppIcon,
+  ShoppingBagOutlined as ShoppingBagOutlinedIcon,
+  Build as BuildIcon,
+  Storage as StorageIcon,
+  Business as BusinessIcon,
+} from '@mui/icons-material';
+import { Tooltip, Menu, MenuItem, Button, Snackbar, Alert } from '@mui/material';
 import Contacts from './admincomponents/Contacts';
 import Sales from './admincomponents/Sales';
 import Activities from './admincomponents/Activities';
@@ -26,13 +26,14 @@ import Services from './admincomponents/Services';
 import Stock from './admincomponents/Stock';
 import UploadFiles from './admincomponents/UploadFiles';
 import Organisation from './admincomponents/Organisation';
-import Column from './admincomponents/Column';
+import AddEnquiryDialog from './AddEnquiryDialog';
 
 const AdminPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState('Dashboard');
-  const [expandedColumns, setExpandedColumns] = useState(['Lead', 'Prospect', 'Opportunity']);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const sidebarRef = useRef(null);
   const { user, logout } = useAuth();
 
@@ -99,19 +100,20 @@ const AdminPage = () => {
     }
   };
 
-  const toggleExpand = (columnName) => {
-    setExpandedColumns((prev) => {
-      const isExpanded = prev.includes(columnName);
-      if (isExpanded) {
-        return prev.filter((name) => name !== columnName);
-      } else {
-        if (prev.length >= 4) {
-          return [...prev.slice(1), columnName];
-        } else {
-          return [...prev, columnName];
-        }
-      }
-    });
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ open: false, message: '', severity: 'success' });
   };
 
   return (
@@ -155,8 +157,8 @@ const AdminPage = () => {
                     <MenuIcon />
                   </button>
                 </Tooltip>
-                <div  onClick={handleSearchClick} className="relative">
-                  <input type="text" placeholder="Search"  className="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                <div onClick={handleSearchClick} className="relative">
+                  <input type="text" placeholder="Search" className="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   <SearchIcon className="absolute left-3 top-2.5 text-gray-400 cursor-pointer" />
                 </div>
               </div>
@@ -172,7 +174,7 @@ const AdminPage = () => {
                   </button>
                 </Tooltip>
                 <Tooltip title="Add new">
-                  <button className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600">
+                  <button className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600" onClick={handleDialogOpen}>
                     <AddIcon />
                   </button>
                 </Tooltip>
@@ -207,6 +209,19 @@ const AdminPage = () => {
           {renderComponent()}
         </div>
       </div>
+
+      <AddEnquiryDialog open={dialogOpen} onClose={handleDialogClose} showSnackbar={showSnackbar} />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

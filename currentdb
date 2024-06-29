@@ -1,0 +1,159 @@
+create table
+  public.categories (
+    category_id serial,
+    category_name character varying(255) not null,
+    constraint categories_pkey primary key (category_id)
+  ) tablespace pg_default;
+
+  create table
+  public.pipeline_fields (
+    field_id serial,
+    stage_id integer not null,
+    field_name character varying(255) not null,
+    is_file boolean null default false,
+    constraint pipeline_fields_pkey primary key (field_id),
+    constraint pipeline_fields_stage_id_fkey foreign key (stage_id) references pipeline_stages (stage_id)
+  ) tablespace pg_default;
+
+  create table
+  public.pipeline_stages (
+    stage_id serial,
+    pipeline_id integer not null,
+    stage_name character varying(255) not null,
+    constraint pipeline_stages_pkey primary key (stage_id),
+    constraint pipeline_stages_pipeline_id_fkey foreign key (pipeline_id) references pipelines (pipeline_id)
+  ) tablespace pg_default;
+
+  create table
+  public.pipelines (
+    pipeline_id serial,
+    pipeline_name character varying(255) not null,
+    constraint pipelines_pkey primary key (pipeline_id),
+    constraint pipeline_name_unique unique (pipeline_name)
+  ) tablespace pg_default;
+
+  create table
+  public.products (
+    product_id serial,
+    product_code character varying(50) not null,
+    product_name character varying(255) not null,
+    category_id integer null,
+    subcategory_id integer null,
+    price numeric(10, 2) not null,
+    min_stock integer not null,
+    max_stock integer not null,
+    current_stock integer not null default 0,
+    constraint products_pkey primary key (product_id),
+    constraint products_category_id_fkey foreign key (category_id) references categories (category_id),
+    constraint products_subcategory_id_fkey foreign key (subcategory_id) references subcategories (subcategory_id)
+  ) tablespace pg_default;
+
+
+  create view
+  public.products_view as
+select
+  p.product_id,
+  p.product_code,
+  p.product_name,
+  c.category_name,
+  s.subcategory_name,
+  p.price,
+  p.min_stock,
+  p.max_stock
+from
+  products p
+  join categories c on p.category_id = c.category_id
+  join subcategories s on p.subcategory_id = s.subcategory_id;
+
+  create table
+  public.subcategories (
+    subcategory_id serial,
+    subcategory_name character varying(255) not null,
+    category_id integer null,
+    constraint subcategories_pkey primary key (subcategory_id),
+    constraint subcategories_category_id_fkey foreign key (category_id) references categories (category_id)
+  ) tablespace pg_default;
+
+
+  create table
+  public.uploaded_files (
+    file_id serial,
+    file_name character varying(255) not null,
+    file_path character varying(255) not null,
+    uploaded_by integer not null,
+    upload_date timestamp without time zone null default current_timestamp,
+    staff_access boolean null default false,
+    manager_access boolean null default false,
+    service_access boolean null default false,
+    constraint uploaded_files_pkey primary key (file_id),
+    constraint uploaded_files_uploaded_by_fkey foreign key (uploaded_by) references users (id)
+  ) tablespace pg_default;
+
+
+  create view
+  public.uploaded_files_view as
+select
+  uf.file_id,
+  uf.file_name,
+  uf.file_path,
+  uf.uploaded_by,
+  uf.upload_date,
+  uf.staff_access,
+  uf.manager_access,
+  uf.service_access,
+  u.username as uploaded_by_username,
+  u.useremail as uploaded_by_email
+from
+  uploaded_files uf
+  join users u on uf.uploaded_by = u.id;
+
+create table
+  public.users (
+    id serial,
+    username character varying(50) not null,
+    useremail character varying(100) not null,
+    password character varying(255) not null,
+    role character varying(50) not null,
+    datetime timestamp without time zone null default current_timestamp,
+    mobile_number character varying(50) null,
+    address character varying(255) null,
+    phone_number character varying(50) null,
+    constraint users_pkey primary key (id),
+    constraint users_useremail_key unique (useremail)
+  ) tablespace pg_default;
+
+
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_code VARCHAR(50) UNIQUE NOT NULL,
+    mobile_number_one VARCHAR(15) NOT NULL,
+    mobile_number_two VARCHAR(15),
+    address TEXT,
+    locality VARCHAR(100),
+    lead_source VARCHAR(100),
+    remarks TEXT
+);
+
+
+CREATE TABLE enquiries (
+    id SERIAL PRIMARY KEY,
+    user_name VARCHAR(255) NOT NULL,
+    mobile_number_one VARCHAR(15) NOT NULL,
+    mobile_number_two VARCHAR(15),
+    customer_code VARCHAR(50),
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    salesflow_code VARCHAR(50),
+    priority VARCHAR(50),
+    estimated_purchase_price NUMERIC,
+    pipeline VARCHAR(100),
+    stage VARCHAR(100),
+    currently_assigned_to VARCHAR(100),
+    lead_source VARCHAR(100),
+    invoiced BOOLEAN DEFAULT FALSE,
+    collected BOOLEAN DEFAULT FALSE,
+    locality VARCHAR(100),
+    address TEXT,
+    remarks TEXT
+);
